@@ -1,8 +1,8 @@
 # Laravel Tag Helpers
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/schivei/laravel-tag-helper.svg?style=flat-square)](https://packagist.org/packages/schivei/laravel-tag-helper)
-[![Build Status](https://img.shields.io/travis/schivei/laravel-tag-helper/master.svg?style=flat-square)](https://travis-ci.org/schivei/laravel-tag-helper)
-[![Quality Score](https://img.shields.io/scrutinizer/g/schivei/laravel-tag-helper.svg?style=flat-square)](https://scrutinizer-ci.com/g/schivei/laravel-tag-helper)
+[![Build Status](https://github.com/schivei/laravel-tag-helper/actions/workflows/php.yml/badge.svg)](https://github.com/schivei/laravel-tag-helper/actions/workflows/php.yml)
+[![codecov](https://codecov.io/gh/schivei/laravel-tag-helper/branch/master/graph/badge.svg?token=KFB5AUBUSR)](https://codecov.io/gh/schivei/laravel-tag-helper)
 [![Total Downloads](https://img.shields.io/packagist/dt/schivei/laravel-tag-helper.svg?style=flat-square)](https://packagist.org/packages/schivei/laravel-tag-helper)
 
 This package allows you to register custom "tag helpers" in your Laravel application. These helpers can modify the HTML code.
