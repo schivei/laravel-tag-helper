@@ -7,7 +7,7 @@
 
 This package allows you to register custom "tag helpers" in your Laravel application. These helpers can modify the HTML code.
 
-> It is a fork of [schivei/laravel-tag-helper](https://github.com/schivei/laravel-tag-helper)
+> It is a fork of [beyondcode/laravel-tag-helper](https://github.com/beyondcode/laravel-tag-helper)
 
 For example, instead of this:
 
