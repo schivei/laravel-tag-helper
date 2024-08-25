@@ -1,40 +1,41 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests;
+namespace Schivei\TagHelper\Tests;
 
-use BeyondCode\TagHelper\TagHelper;
+use Schivei\TagHelper\TagHelper;
 use Illuminate\Support\Facades\Blade;
 use Spatie\Snapshots\MatchesSnapshots;
 use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase as Orchestra;
-use BeyondCode\TagHelper\TagHelperServiceProvider;
+use Schivei\TagHelper\TagHelperServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
     use MatchesSnapshots;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 
         Artisan::call('view:clear');
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app) : array
     {
         return [
             TagHelperServiceProvider::class,
         ];
     }
 
-    protected function getPackageAliases($app)
+    protected function getPackageAliases($app) : array
     {
         return [
             'TagHelper' => TagHelper::class,
         ];
     }
 
-    protected function assertMatchesViewSnapshot(string $viewName, array $data = [])
+    protected function assertMatchesViewSnapshot(string $viewName, array $data = []) : void
     {
         $fullViewName = "views.{$viewName}";
 

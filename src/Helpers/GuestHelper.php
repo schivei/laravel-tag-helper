@@ -1,29 +1,33 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
+/**
+ * Class GuestHelper
+ * @package Schivei\TagHelper\Helpers
+ */
 class GuestHelper extends Helper
 {
-    protected $targetAttribute = 'guest';
+    protected ?string $targetAttribute = 'guest';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
-        // Check if an explicit attribute value was specified.
-        if ($element->getAttribute('guest') === true) {
+        $guest = $element->getAttributeForBlade('guest');
+
+        if (empty($guest) || "'guest'" === $guest || "':guest'" === $guest) {
             $guest = null;
-        } else {
-            $guest = $element->getAttributeForBlade('guest');
         }
 
         $element->removeAttribute('guest');
 
-        $outerText = '@guest('.$guest.') ';
-        $outerText .= $element->getOuterText();
-        $outerText .= ' @endguest';
+        $outerHtml = '@guest('.$guest.') ';
+        $outerHtml .= $element->getOuterHtml();
+        $outerHtml .= ' @endguest';
 
-        $element->setOuterText($outerText);
+        $element->setOuterHtml($outerHtml);
     }
 }

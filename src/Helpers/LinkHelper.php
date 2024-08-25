@@ -1,21 +1,26 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
+/**
+ * Class LinkHelper
+ * @package Schivei\TagHelper\Helpers
+ */
 class LinkHelper extends Helper
 {
-    protected $targetElement = 'a';
+    protected string $targetElement = 'a';
 
-    protected $targetAttribute = 'route';
+    protected ?string $targetAttribute = 'route';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
         $element->setTag('a');
 
-        $element->href = '{{route('.$element->getAttributeForBlade('route').', '.$element->getAttributeForBlade('route-parameters', '[]').')}}';
+        $element->setAttribute('href', route($element->getAttributeForBlade('route'), json_decode($element->getAttributeForBlade('route-parameters', '[]'))));
 
         $element->removeAttribute('route');
         $element->removeAttribute('route-parameters');

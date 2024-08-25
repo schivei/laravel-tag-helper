@@ -1,14 +1,28 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper;
+namespace Schivei\TagHelper;
 
-use BeyondCode\TagHelper\Exceptions\InvalidHelperGiven;
+use Schivei\TagHelper\Exceptions\InvalidHelperGiven;
 
+/**
+ * Class TagHelper
+ * @package Schivei\TagHelper
+ */
 class TagHelper
 {
-    /** @var array */
-    public $registeredTagHelpers = [];
+    /**
+     * Registered tag helpers
+     *
+     * @var string[]
+     */
+    public array $registeredTagHelpers = [];
 
+    /**
+     * Get all registered tag helpers
+     *
+     * @return Helper[]
+     */
     public function getRegisteredTagHelpers(): array
     {
         return array_map(function ($helper) {
@@ -16,9 +30,16 @@ class TagHelper
         }, $this->registeredTagHelpers);
     }
 
-    public function helper(string $helper)
+    /**
+     * Register a tag helper
+     *
+     * @param string $helper
+     * @return void
+     * @throws InvalidHelperGiven
+     */
+    public function helper(string $helper): void
     {
-        if (! is_subclass_of($helper, Helper::class)) {
+        if (!is_subclass_of($helper, Helper::class)) {
             throw InvalidHelperGiven::withHelper($helper);
         }
 

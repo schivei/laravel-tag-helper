@@ -1,29 +1,33 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
+/**
+ * Class AuthHelper
+ * @package Schivei\TagHelper\Helpers
+ */
 class AuthHelper extends Helper
 {
-    protected $targetAttribute = 'auth';
+    protected ?string $targetAttribute = 'auth';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
-        // Check if an explicit attribute value was specified.
-        if ($element->getAttribute('auth') === true) {
+        $auth = $element->getAttributeForBlade('auth');
+
+        if (empty($auth) || "'auth'" === $auth || "':auth'" === $auth) {
             $auth = null;
-        } else {
-            $auth = $element->getAttributeForBlade('auth');
         }
 
         $element->removeAttribute('auth');
 
-        $outerText = '@auth('.$auth.') ';
-        $outerText .= $element->getOuterText();
-        $outerText .= ' @endauth';
+        $outerHtml = '@auth('.$auth.') ';
+        $outerHtml .= $element->getOuterHtml();
+        $outerHtml .= ' @endauth';
 
-        $element->setOuterText($outerText);
+        $element->setOuterHtml($outerHtml);
     }
 }

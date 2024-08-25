@@ -1,17 +1,22 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
+/**
+ * Class CsrfHelper
+ * @package Schivei\TagHelper\Helpers
+ */
 class CsrfHelper extends Helper
 {
-    protected $targetAttribute = 'csrf';
+    protected ?string $targetAttribute = 'csrf';
 
-    protected $targetElement = 'form';
+    protected string $targetElement = 'form';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
         $element->removeAttribute('csrf');
 

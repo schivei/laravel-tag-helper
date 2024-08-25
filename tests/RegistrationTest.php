@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests;
+namespace Schivei\TagHelper\Tests;
 
-use BeyondCode\TagHelper\Facades\TagHelper;
-use BeyondCode\TagHelper\Exceptions\InvalidHelperGiven;
-use BeyondCode\TagHelper\Tests\Compilation\Tags\RegularTag;
+use Schivei\TagHelper\Facades\TagHelper;
+use Schivei\TagHelper\Exceptions\InvalidHelperGiven;
+use Schivei\TagHelper\Tests\Compilation\Tags\RegularTag;
 
 class RegistrationTest extends TestCase
 {

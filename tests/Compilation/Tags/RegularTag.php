@@ -1,17 +1,18 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests\Compilation\Tags;
+namespace Schivei\TagHelper\Tests\Compilation\Tags;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class RegularTag extends Helper
 {
-    protected $targetElement = 'div';
+    protected string $targetElement = 'div';
 
-    protected $targetAttribute = 'custom-helper';
+    protected ?string $targetAttribute = 'custom-helper';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
         $element->appendInnerText('Processed');
         $element->removeAttribute('custom-helper');

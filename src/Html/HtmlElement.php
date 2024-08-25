@@ -1,22 +1,33 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Html;
+namespace Schivei\TagHelper\Html;
 
-use simplehtmldom_1_5\simple_html_dom_node;
+use DOMDocument;
+use DOMElement;
+use DOMException;
+use DOMNode;
+use FluentDOM\Loader\Options;
 
+/**
+ * Class HtmlElement
+ * @package Schivei\TagHelper\Html
+ */
 class HtmlElement
 {
-    /** @var simple_html_dom_node */
-    protected $domNode;
+    protected DOMElement $domNode;
 
-    public static function create(simple_html_dom_node $node)
+    protected DOMDocument $doc;
+
+    public static function create(DOMDocument &$doc, DOMElement &$node) : self
     {
-        return new static($node);
+        return new static($doc, $node);
     }
 
-    public function __construct(simple_html_dom_node $domNode)
+    public function __construct(DOMDocument &$doc, DOMElement &$domNode)
     {
-        $this->domNode = $domNode;
+        $this->doc = &$doc;
+        $this->domNode = &$domNode;
     }
 
     public function hasAttribute(string $attribute): bool
@@ -24,86 +35,128 @@ class HtmlElement
         return $this->domNode->hasAttribute($attribute);
     }
 
-    public function getAttribute(string $attribute, $default = null)
+    public function getAttribute(string $attribute, $default = null) : string
     {
-        $attribute = $this->domNode->getAttribute($attribute);
-
-        return $attribute === false ? $default : $attribute;
-    }
-
-    public function getAttributeForBlade(string $attribute, $default = null)
-    {
-        if ($this->domNode->hasAttribute(':'.$attribute)) {
-            return $this->getAttribute(':'.$attribute, $default);
+        if ($this->hasAttribute($attribute)) {
+            return $this->domNode->getAttribute($attribute) ?? $default ?? '';
         }
-        $attribute = $this->domNode->getAttribute($attribute);
 
-        return $attribute === false ? $default : "'".$attribute."'";
+        return $default ?? '';
     }
 
-    public function setAttribute(string $attribute, string $value)
+    public function getAttributeForBlade(string $attribute, $default = null) : string
+    {
+        $result = $this->getAttribute(":$attribute", $default);
+
+        $result = !empty($result) ? $result : $this->getAttribute($attribute, $default);
+
+        return (!empty($result) ? $result : $default) ?? "'$attribute'";
+    }
+
+    public function setAttribute(string $attribute, string $value) : void
     {
         $this->domNode->setAttribute($attribute, $value);
     }
 
-    public function removeAttribute(string $attribute)
+    public function removeAttribute(string $attribute) : void
     {
-        $this->domNode->setAttribute($attribute, null);
-        $this->domNode->setAttribute(':'.$attribute, null);
+        $this->domNode->removeAttribute($attribute);
+    }
+
+    public function getOuterHtml() : string
+    {
+        return $this->doc->saveHTML($this->domNode);
+    }
+
+    public function setOuterHtml(string $html) : void
+    {
+        $fragment = $this->doc->createDocumentFragment();
+        $fragment->appendXML($html);
+
+        $this->domNode->replaceWith($fragment);
+    }
+
+    public function getInnerHtml() : string
+    {
+        $inners = [];
+
+        foreach ($this->domNode->childNodes as $child) {
+            $inners[] = $this->doc->saveHTML($child);
+        }
+
+        return implode("\n", $inners);
+    }
+
+    public function setInnerHtml(string $html) : void
+    {
+        $fragment = $this->doc->createDocumentFragment();
+        $fragment->appendXML($html);
+
+        $this->domNode->nodeValue = '';
+        $this->domNode->appendChild($fragment);
+    }
+
+    public function appendHtml(string $html) : void
+    {
+        $fragment = $this->doc->createDocumentFragment();
+        $fragment->appendXML($html);
+
+        $this->domNode->appendChild($fragment);
+    }
+
+    public function prependHtml(string $html) : void
+    {
+        $fragment = $this->doc->createDocumentFragment();
+        $fragment->appendXML($html);
+
+        $this->domNode->insertBefore($fragment, $this->domNode->firstChild);
     }
 
     public function getInnerText(): string
     {
-        return $this->domNode->innertext();
+        return $this->domNode->textContent;
     }
 
-    public function setInnerText(string $text)
+    public function setInnerText(string $text) : void
     {
-        $this->domNode->innertext = $text;
+        $this->domNode->textContent = $text;
     }
 
-    public function getPlainText(): string
-    {
-        return $this->domNode->text();
-    }
-
-    public function prependInnerText(string $prepend)
+    public function prependInnerText(string $prepend) : void
     {
         $this->setInnerText($prepend.$this->getInnerText());
     }
 
-    public function appendInnerText(string $append)
+    public function appendInnerText(string $append) : void
     {
         $this->setInnerText($this->getInnerText().$append);
     }
 
-    public function getOuterText(): string
+    public function getTag() : string
     {
-        return $this->domNode->outertext();
+        return $this->domNode->nodeName;
     }
 
-    public function setOuterText(string $text)
+    /**
+     * @throws DOMException
+     */
+    public function setTag(string $tag) : void
     {
-        $this->domNode->outertext = $text;
+        $el = $this->doc->createElement($tag);
+
+        foreach ($this->domNode->childNodes as $child) {
+            $el->appendChild($child->cloneNode(true));
+        }
+
+        foreach ($this->domNode->attributes as $attribute) {
+            $el->setAttribute($attribute->nodeName, $attribute->nodeValue);
+        }
+
+        $this->domNode->parentNode->replaceChild($el, $this->domNode);
     }
 
-    public function setTag(string $tag)
+    public function __toString() : string
     {
-        $this->domNode->tag = $tag;
-    }
-
-    public function __call($method, $args)
-    {
-        return call_user_func_array([$this->domNode, $method], $args);
-    }
-
-    public function __get($key)
-    {
-        return $this->domNode->$key;
-    }
-
-    public function __set($key, $val)
-    {
-        return $this->domNode->$key = $val;
+        return $this->getOuterHtml();
     }
 }

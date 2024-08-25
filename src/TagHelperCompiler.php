@@ -1,36 +1,56 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper;
+namespace Schivei\TagHelper;
 
-use Sunra\PhpSimple\HtmlDomParser;
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
+use Exception;
+use FluentDOM\Loader\Options;
 use Illuminate\Filesystem\Filesystem;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Html\HtmlElement;
 
+/**
+ * Class TagHelperCompiler
+ * @package Schivei\TagHelper
+ */
 class TagHelperCompiler
 {
-    /** @var TagHelper */
-    protected $tagHelper;
+    /**
+     * The tag helper instance.
+     *
+     * @var TagHelper $tagHelper
+     */
+    protected TagHelper $tagHelper;
 
-    /** @var Filesystem */
-    protected $files;
+    /**
+     * The filesystem instance.
+     *
+     * @var Filesystem $files
+     */
+    protected Filesystem $files;
 
+    /**
+     * Create a new compiler instance.
+     *
+     * @param TagHelper $tagHelper
+     * @param Filesystem $files
+     */
     public function __construct(TagHelper $tagHelper, Filesystem $files)
     {
         $this->tagHelper = $tagHelper;
         $this->files = $files;
     }
 
-    public function needsToBeRecompiled($path, $compiled)
-    {
-        if (! $this->files->exists($compiled)) {
-            return true;
-        }
-
-        return $this->files->lastModified($path) >=
-            $this->files->lastModified($compiled);
-    }
-
-    public function compile(string $viewContent)
+    /**
+     * Compile the view at the given content.
+     *
+     * @param  string  $viewContent
+     * @return string
+     */
+    public function compile(string $viewContent) : string
     {
         return array_reduce(
             $this->tagHelper->getRegisteredTagHelpers(),
@@ -39,31 +59,52 @@ class TagHelperCompiler
         );
     }
 
+    /**
+     * Get the tag selector for the helper.
+     *
+     * @param Helper $tagHelper
+     * @return string
+     */
     protected function getTagSelector(Helper $tagHelper): string
     {
-        $selector = $tagHelper->getTargetElement();
-        if (! is_null($tagHelper->getTargetAttribute())) {
-            $selector .= "[{$tagHelper->getTargetAttribute()}]";
-            $selector .= ", {$tagHelper->getTargetElement()}[:{$tagHelper->getTargetAttribute()}]";
-        }
+        $elements = explode('|', $tagHelper->getTargetElement());
+        return implode('|', array_map(function ($element) use ($tagHelper) {
+            $selector = "//$element";
+            if (!is_null($tagHelper->getTargetAttribute())) {
+                $selector .= "[@{$tagHelper->getTargetAttribute()}]";
+            }
 
-        return $selector;
+            return $selector;
+        }, $elements));
     }
 
-    protected function parseHtml(string $viewContents, Helper $tagHelper)
+    /**
+     * Parse the HTML content of the view.
+     *
+     * @param string $viewContents
+     * @param Helper $tagHelper
+     * @return string
+     */
+    protected function parseHtml(string $viewContents, Helper $tagHelper) : string
     {
-        $html = HtmlDomParser::str_get_html($viewContents, $lowercase = true, $forceTagsClosed = true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN = false);
+        $doc = new DOMDocument();
 
-        if ($html === false) {
-            return $viewContents;
+        $doc->loadHTML($viewContents, LIBXML_HTML_NOIMPLIED | LIBXML_NOERROR | LIBXML_NOWARNING);
+
+        $selector = new DOMXPath($doc);
+
+        $elements = $selector->query($this->getTagSelector($tagHelper));
+
+        foreach ($elements as /** @type DOMElement $element */ $element) {
+            $el = HtmlElement::create($doc,$element);
+
+            $tagHelper->process($el);
         }
 
-        $elements = array_reverse($html->find($this->getTagSelector($tagHelper)));
+        $content = FluentDOM($doc->documentElement)->outerHtml();
 
-        foreach ($elements as $element) {
-            $tagHelper->process(HtmlElement::create($element));
-        }
+        $content = str_replace(['%7B', '%7D'], ['{', '}'], $content);
 
-        return $html;
+        return empty($content) ? $viewContents : $content;
     }
 }

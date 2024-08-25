@@ -1,14 +1,16 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests\Helpers;
+namespace Schivei\TagHelper\Tests\Helpers;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use BeyondCode\TagHelper\Tests\TestCase;
+use Illuminate\View\ViewException;
+use Schivei\TagHelper\Tests\TestCase;
 
 class BuiltInHelperTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
@@ -30,7 +32,7 @@ class BuiltInHelperTest extends TestCase
     /** @test */
     public function it_generates_links()
     {
-        \Route::name('some_route')->get('/some_route', function () {
+        Route::name('some_route')->get('/some_route', function () {
         });
 
         $this->assertMatchesViewSnapshot('link_to_route');
@@ -39,7 +41,7 @@ class BuiltInHelperTest extends TestCase
     /** @test */
     public function it_generates_links_with_route_parameters()
     {
-        \Route::name('route_with_parameters')->get('/route/{a}/{b}', function () {
+        Route::name('route_with_parameters')->get('/route/{a}/{b}', function () {
         });
 
         $this->assertMatchesViewSnapshot('link_to_route_with_parameters');
@@ -58,9 +60,33 @@ class BuiltInHelperTest extends TestCase
     }
 
     /** @test */
+    public function it_checks_conditions_with_true_value_content()
+    {
+        $this->assertMatchesViewSnapshot('conditional_content', ['condition' => true]);
+    }
+
+    /** @test */
+    public function it_checks_conditions_with_faulty_value_content()
+    {
+        $this->assertMatchesViewSnapshot('conditional_content', ['condition' => false]);
+    }
+
+    /** @test */
+    public function it_checks_concat()
+    {
+        $this->assertMatchesViewSnapshot('concat', ['concat' => ". It's working!"]);
+    }
+
+    /** @test */
     public function it_performs_auth_checks()
     {
         $this->assertMatchesViewSnapshot('auth');
+    }
+
+    /** @test */
+    public function it_performs_auth_web_checks()
+    {
+        $this->assertMatchesViewSnapshot('auth_web');
     }
 
     /** @test */

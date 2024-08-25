@@ -1,11 +1,13 @@
 # Laravel Tag Helpers
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/beyondcode/laravel-tag-helper.svg?style=flat-square)](https://packagist.org/packages/beyondcode/laravel-tag-helper)
-[![Build Status](https://img.shields.io/travis/beyondcode/laravel-tag-helper/master.svg?style=flat-square)](https://travis-ci.org/beyondcode/laravel-tag-helper)
-[![Quality Score](https://img.shields.io/scrutinizer/g/beyondcode/laravel-tag-helper.svg?style=flat-square)](https://scrutinizer-ci.com/g/beyondcode/laravel-tag-helper)
-[![Total Downloads](https://img.shields.io/packagist/dt/beyondcode/laravel-tag-helper.svg?style=flat-square)](https://packagist.org/packages/beyondcode/laravel-tag-helper)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/schivei/laravel-tag-helper.svg?style=flat-square)](https://packagist.org/packages/schivei/laravel-tag-helper)
+[![Build Status](https://img.shields.io/travis/schivei/laravel-tag-helper/master.svg?style=flat-square)](https://travis-ci.org/schivei/laravel-tag-helper)
+[![Quality Score](https://img.shields.io/scrutinizer/g/schivei/laravel-tag-helper.svg?style=flat-square)](https://scrutinizer-ci.com/g/schivei/laravel-tag-helper)
+[![Total Downloads](https://img.shields.io/packagist/dt/schivei/laravel-tag-helper.svg?style=flat-square)](https://packagist.org/packages/schivei/laravel-tag-helper)
 
 This package allows you to register custom "tag helpers" in your Laravel application. These helpers can modify the HTML code.
+
+> It is a fork of [schivei/laravel-tag-helper](https://github.com/schivei/laravel-tag-helper)
 
 For example, instead of this:
 
@@ -29,23 +31,23 @@ You can use custom tag helpers to turn this code into this:
 You can install the package via composer:
 
 ```bash
-composer require beyondcode/laravel-tag-helper
+composer require schivei/laravel-tag-helper
 ```
 
 The package will automatically register itself.
 
 ## Usage
 
-You can create your own Tag Helper, by creating a new class and extend from the `BeyondCode\TagHelper\Helper` class.
+You can create your own Tag Helper, by creating a new class and extend from the `Schivei\TagHelper\Helper` class.
 Within this class you can define on which HTML elements and attributes your helper should be triggered:
 
 ```php
 <?php
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class CustomTagHelper extends Helper
 {
@@ -102,10 +104,10 @@ In this example, we are binding our helper to HTML elements `<my-custom-link hre
 ```php
 <?php
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class CustomLink extends Helper
 {
@@ -128,10 +130,10 @@ We then update the `href` attribute of our link, remove the `route` attribute an
 ```php
 <?php
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class CustomLink extends Helper
 {
@@ -157,10 +159,10 @@ Your custom tag helpers can you manipulate the HTML that is inside or outside of
 ```php
 <?php
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class CustomLink extends Helper
 {
@@ -173,9 +175,6 @@ class CustomLink extends Helper
         $element->removeAttribute('add-hidden-field');
         
         $element->appendInnerText('<input type="hidden" name="hidden" />');
-        
-        // $element->prependInnerText('');
-        // $element->setInnerText('');
     }
 }
 ```
@@ -198,10 +197,10 @@ You can access this data, using the `getAttribute` method inside your helper:
 ```php
 <?php
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class CustomForm extends Helper
 {
@@ -229,10 +228,10 @@ For example:
 ```php
 <?php
 
-namespace BeyondCode\TagHelper\Helpers;
+namespace Schivei\TagHelper\Helpers;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class CustomForm extends Helper
 {

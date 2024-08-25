@@ -1,22 +1,32 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests\Compilation;
+namespace Schivei\TagHelper\Tests\Compilation;
 
 use Illuminate\Support\Facades\View;
-use BeyondCode\TagHelper\Tests\TestCase;
-use BeyondCode\TagHelper\Facades\TagHelper;
-use BeyondCode\TagHelper\Tests\Compilation\Tags\EmailTag;
-use BeyondCode\TagHelper\Tests\Compilation\Tags\RegularTag;
-use BeyondCode\TagHelper\Tests\Compilation\Tags\ViewDataTag;
-use BeyondCode\TagHelper\Tests\Compilation\Tags\AttributeTag;
+use Schivei\TagHelper\Helpers\AssetHelper;
+use Schivei\TagHelper\Tests\TestCase;
+use Schivei\TagHelper\Facades\TagHelper;
+use Schivei\TagHelper\Tests\Compilation\Tags\EmailTag;
+use Schivei\TagHelper\Tests\Compilation\Tags\RegularTag;
+use Schivei\TagHelper\Tests\Compilation\Tags\ViewDataTag;
+use Schivei\TagHelper\Tests\Compilation\Tags\AttributeTag;
 
 class TagHelperCompilationTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
         View::addLocation(__DIR__.'/stubs');
+    }
+
+    /** @test */
+    public function it_compiles_tags_with_asset_attribute()
+    {
+        TagHelper::helper(AssetHelper::class);
+
+        $this->assertMatchesViewSnapshot('asset_attribute');
     }
 
     /** @test */

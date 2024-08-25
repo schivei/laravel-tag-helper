@@ -1,17 +1,18 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests\Compilation\Tags;
+namespace Schivei\TagHelper\Tests\Compilation\Tags;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class ViewDataTag extends Helper
 {
-    protected $targetElement = 'div';
+    protected string $targetElement = 'div';
 
-    protected $targetAttribute = 'view-data';
+    protected ?string $targetAttribute = 'view-data';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
         $element->appendInnerText('{{'.$element->getAttribute('view-data').'}}');
         $element->removeAttribute('view-data');

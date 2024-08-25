@@ -1,17 +1,19 @@
 <?php
+declare(strict_types=1);
 
-namespace BeyondCode\TagHelper\Tests\Compilation\Tags;
+namespace Schivei\TagHelper\Tests\Compilation\Tags;
 
-use BeyondCode\TagHelper\Helper;
-use BeyondCode\TagHelper\Html\HtmlElement;
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
 
 class EmailTag extends Helper
 {
-    protected $targetElement = 'custom-email';
+    protected string $targetElement = 'custom-email';
 
-    public function process(HtmlElement $element)
+    public function process(HtmlElement $element) : void
     {
         $element->setTag('div');
         $element->prependInnerText('This is a custom email tag helper.');
+        $element->prependInnerText('This is a custom email tag helper 0.');
     }
 }
