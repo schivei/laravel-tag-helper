@@ -29,9 +29,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
-    - name: Makefile Build Target Finder
-      uses: meihei3/makefile-build-target-finder@v0.1.0
-
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
@@ -45,4 +42,4 @@ jobs:
 
     - name: Run test suite
       run: composer run-script test-coverage
-          
+
