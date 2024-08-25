@@ -38,13 +38,21 @@ jobs:
       run: composer update --prefer-dist --no-progress
 
     - name: Run test suite
-      run: composer run-script test
-
-    - name: PHPUnit Coverage Check
-      uses: ericsizemore/phpunit-coverage-check-action@1.0.1
-      with:
-        composer_require_dev: true
-
-    - name: Run test suite
       run: composer run-script test-coverage
 
+    - name: PHPUnit Tests
+      uses: php-actions/phpunit@v3
+      env:
+        XDEBUG_MODE: coverage
+      with:
+        bootstrap: vendor/autoload.php
+        configuration: phpunit.xml.dist
+        php_extensions: xdebug
+        args: tests --coverage-clover ./build/coverage.xml
+
+    - name: Upload to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODE_COV_TOKEN }}
+        files: ./coverage.xml
+        verbose: true
