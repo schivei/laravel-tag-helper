@@ -7,4 +7,4 @@ test:
 
 .PHONY coverage:
 coverage:
-	php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-html=build/coverage
+	php -d xdebug.mode=coverage vendor/bin/phpunit --coverage-html=build/coverage --coverage-clover=build/coverage.xml
