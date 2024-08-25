@@ -23,17 +23,17 @@
         }
     ],
     "require": {
-        "php": "^8",
+        "php": "^8.2",
         "fluentdom/fluentdom": "^8.0",
         "ext-libxml": "*",
         "ext-dom": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1",
-        "orchestra/testbench": "^9",
+        "orchestra/testbench": "^v9.3",
         "phpunit/php-code-coverage": "^11.0",
-        "phpunit/phpunit": "^11",
-        "spatie/phpunit-snapshot-assertions": "^5"
+        "phpunit/phpunit": "^11.3",
+        "spatie/phpunit-snapshot-assertions": "^5.1"
     },
     "autoload": {
         "psr-4": {

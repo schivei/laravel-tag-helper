@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9658ff66ad16d279de9588c407ea2ff",
+    "content-hash": "01706a0e09bd7f2102bd7ad0b6982781",
     "packages": [
         {
             "name": "fluentdom/fluentdom",
@@ -9995,7 +9995,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8",
+        "php": "^8.2",
         "ext-libxml": "*",
         "ext-dom": "*"
     },
