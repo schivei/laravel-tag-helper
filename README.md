@@ -358,11 +358,11 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ### Security
 
-If you discover any security related issues, please email marcel@beyondco.de instead of using the issue tracker.
+If you discover any security related issues, please email costa@elton.schivei.nom.br instead of using the issue tracker.
 
 ## Credits
 
-- [Marcel Pociot](https://github.com/:author_username)
+- [Elton Schivei Costa](https://github.com/schivei)
 - [All Contributors](../../contributors)
 
 ## License
