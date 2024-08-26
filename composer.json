@@ -14,12 +14,6 @@
             "email": "costa@elton.schivei.nom.br",
             "homepage": "https://elton.schivei.nom.br",
             "role": "Developer"
-        },
-        {
-            "name": "Marcel Pociot",
-            "email": "marcel@beyondco.de",
-            "homepage": "https://beyondcode.de",
-            "role": "Developer"
         }
     ],
     "require": {
