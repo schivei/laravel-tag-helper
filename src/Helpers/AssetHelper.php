@@ -31,6 +31,10 @@ class AssetHelper extends Helper
             $attr = "href";
         }
 
-        $element->setAttribute($attr, asset($asset));
+        if (trim($asset)[0] !== '$') {
+            $asset = "'$asset'";
+        }
+
+        $element->setAttribute($attr, "{{ asset($asset) }}");
     }
 }

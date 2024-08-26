@@ -103,7 +103,7 @@ class TagHelperCompiler
 
         $content = FluentDOM($doc->documentElement)->outerHtml();
 
-        $content = str_replace(['%7B', '%7D'], ['{', '}'], $content);
+        $content = str_replace(['%7B%7B%20', '%20%7D%7D', '%7B%7B', '%7D%7D'], ['{{ ', ' }}', '{{', '}}'], $content);
 
         return empty($content) ? $viewContents : $content;
     }

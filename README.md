@@ -338,9 +338,26 @@ Examples:
 <a route="home">Home</a>
 
 <a route="profile" :route-parameters="[$user->id()]">Home</a>
-
 ```
 
+### Asset
+
+When your `a|area|base|link|audio|embed|iframe|img|input|script|source|track|video` tags contains an `asset` attribute, this helper will change the href/src to the appropriate route.
+
+Examples:
+```html
+<link asset="asset.css" .../>
+
+<script asset="asset.js" .../>
+```
+
+Will become:
+
+```html
+<link href="http://yourdomain.com/asset_path/asset.css" .../>
+
+<script src="http://yourdomain.com/asset_path/asset.js" .../>
+```
 
 ### Testing
 
