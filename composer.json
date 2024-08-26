@@ -18,9 +18,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "fluentdom/fluentdom": "^8.0",
-        "ext-libxml": "*",
-        "ext-dom": "*"
+        "paquettg/php-html-parser": "^2.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1",

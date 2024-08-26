@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use PHPHtmlParser\Exceptions\ChildNotFoundException;
+use PHPHtmlParser\Exceptions\CircularException;
+use PHPHtmlParser\Exceptions\NotLoadedException;
+use PHPHtmlParser\Exceptions\StrictException;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -14,6 +18,12 @@ class ConditionHelper extends Helper
 {
     protected ?string $targetAttribute = 'if';
 
+    /**
+     * @throws ChildNotFoundException
+     * @throws CircularException
+     * @throws StrictException
+     * @throws NotLoadedException
+     */
     public function process(HtmlElement $element) : void
     {
         $condition = $element->getAttribute('if');
@@ -31,10 +41,7 @@ class ConditionHelper extends Helper
             return;
         }
 
-        $outerHtml = '@if('.$condition.') ';
-        $outerHtml .= $element;
-        $outerHtml .= ' @endif';
-
-        $element->setOuterHtml($outerHtml);
+        $element->setBefore('@if(' . $condition . ')');
+        $element->setAfter('@endif');
     }
 }

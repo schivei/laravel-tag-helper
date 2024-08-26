@@ -4,45 +4,40 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "01706a0e09bd7f2102bd7ad0b6982781",
+    "content-hash": "4ee165af8c5bfbe242efb591239472ae",
     "packages": [
         {
-            "name": "fluentdom/fluentdom",
-            "version": "8.0.0",
+            "name": "paquettg/php-html-parser",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ThomasWeinert/FluentDOM.git",
-                "reference": "22ee56352bb5fd0bc41ccf7906780aabc2bccf33"
+                "url": "https://github.com/paquettg/php-html-parser.git",
+                "reference": "668c770fc5724ea3f15b8791435f054835be8d5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ThomasWeinert/FluentDOM/zipball/22ee56352bb5fd0bc41ccf7906780aabc2bccf33",
-                "reference": "22ee56352bb5fd0bc41ccf7906780aabc2bccf33",
+                "url": "https://api.github.com/repos/paquettg/php-html-parser/zipball/668c770fc5724ea3f15b8791435f054835be8d5e",
+                "reference": "668c770fc5724ea3f15b8791435f054835be8d5e",
                 "shasum": ""
             },
             "require": {
-                "ext-dom": "*",
-                "ext-libxml": "*",
-                "php": "~7.2 || ~8.0"
+                "ext-curl": "*",
+                "ext-mbstring": "*",
+                "ext-zlib": "*",
+                "paquettg/string-encode": "~1.0.0",
+                "php": ">=7.1"
             },
             "require-dev": {
-                "ext-simplexml": "*",
-                "ext-xmlreader": "*",
-                "ext-xmlwriter": "*"
-            },
-            "suggest": {
-                "ext-json": "JSON support, needed for several loaders/serializers",
-                "ext-xmlreader": "XMLReader, XML pull parser, read large XMLs",
-                "ext-xmlwriter": "XMLWriter, Write large XMLs",
-                "fluentdom/css-selector": "Allows to use css selectors."
+                "infection/infection": "^0.13.4",
+                "mockery/mockery": "^1.2",
+                "phan/phan": "^2.4",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^7.5.1"
             },
             "type": "library",
             "autoload": {
-                "files": [
-                    "src/FluentDOM.php"
-                ],
                 "psr-4": {
-                    "FluentDOM\\": "src/FluentDOM"
+                    "PHPHtmlParser\\": "src/PHPHtmlParser"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -51,25 +46,73 @@
             ],
             "authors": [
                 {
-                    "name": "FluentDOM Contributors",
-                    "homepage": "https://github.com/FluentDOM/FluentDOM/contributors"
+                    "name": "Gilles Paquette",
+                    "email": "paquettg@gmail.com",
+                    "homepage": "http://gillespaquette.ca"
                 }
             ],
-            "description": "A fluent api for the php dom extension.",
-            "homepage": "http://fluentdom.org",
+            "description": "An HTML DOM parser. It allows you to manipulate HTML. Find tags on an HTML page with selectors just like jQuery.",
+            "homepage": "https://github.com/paquettg/php-html-parser",
             "keywords": [
-                "XMLReader",
-                "XMLWriter",
-                "Xpath",
                 "dom",
-                "jquery",
-                "xml"
+                "html",
+                "parser"
             ],
             "support": {
-                "issues": "https://github.com/ThomasWeinert/FluentDOM/issues",
-                "source": "https://github.com/ThomasWeinert/FluentDOM/tree/8.0.0"
+                "issues": "https://github.com/paquettg/php-html-parser/issues",
+                "source": "https://github.com/paquettg/php-html-parser/tree/2.2.1"
             },
-            "time": "2021-04-18T18:12:11+00:00"
+            "time": "2020-01-20T12:59:15+00:00"
+        },
+        {
+            "name": "paquettg/string-encode",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paquettg/string-encoder.git",
+                "reference": "a8708e9fac9d5ddfc8fc2aac6004e2cd05d80fee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paquettg/string-encoder/zipball/a8708e9fac9d5ddfc8fc2aac6004e2cd05d80fee",
+                "reference": "a8708e9fac9d5ddfc8fc2aac6004e2cd05d80fee",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "stringEncode": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gilles Paquette",
+                    "email": "paquettg@gmail.com",
+                    "homepage": "http://gillespaquette.ca"
+                }
+            ],
+            "description": "Facilitating the process of altering string encoding in PHP.",
+            "homepage": "https://github.com/paquettg/string-encoder",
+            "keywords": [
+                "charset",
+                "encoding",
+                "string"
+            ],
+            "support": {
+                "issues": "https://github.com/paquettg/string-encoder/issues",
+                "source": "https://github.com/paquettg/string-encoder/tree/1.0.1"
+            },
+            "time": "2018-12-21T02:25:09+00:00"
         }
     ],
     "packages-dev": [
@@ -3381,16 +3424,16 @@
         },
         {
             "name": "orchestra/testbench",
-            "version": "v9.3.0",
+            "version": "v9.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench.git",
-                "reference": "6084d0793bae571713e96d48557562bb8276aa7b"
+                "reference": "f79c16b4cc9d22e3a71f8a2bc28326de392ff6aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench/zipball/6084d0793bae571713e96d48557562bb8276aa7b",
-                "reference": "6084d0793bae571713e96d48557562bb8276aa7b",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/f79c16b4cc9d22e3a71f8a2bc28326de392ff6aa",
+                "reference": "f79c16b4cc9d22e3a71f8a2bc28326de392ff6aa",
                 "shasum": ""
             },
             "require": {
@@ -3398,7 +3441,7 @@
                 "fakerphp/faker": "^1.23",
                 "laravel/framework": "^11.11",
                 "mockery/mockery": "^1.6",
-                "orchestra/testbench-core": "^9.3",
+                "orchestra/testbench-core": "^9.4",
                 "orchestra/workbench": "^9.5",
                 "php": "^8.2",
                 "phpunit/phpunit": "^10.5 || ^11.0.1",
@@ -3430,22 +3473,22 @@
             ],
             "support": {
                 "issues": "https://github.com/orchestral/testbench/issues",
-                "source": "https://github.com/orchestral/testbench/tree/v9.3.0"
+                "source": "https://github.com/orchestral/testbench/tree/v9.4.0"
             },
-            "time": "2024-08-14T06:29:45+00:00"
+            "time": "2024-08-26T05:10:07+00:00"
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v9.3.0",
+            "version": "v9.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "d66217119f326f82190a3638739a92a985ad73b3"
+                "reference": "422827e195741ca397408eced09ca473ebbb4086"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/d66217119f326f82190a3638739a92a985ad73b3",
-                "reference": "d66217119f326f82190a3638739a92a985ad73b3",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/422827e195741ca397408eced09ca473ebbb4086",
+                "reference": "422827e195741ca397408eced09ca473ebbb4086",
                 "shasum": ""
             },
             "require": {
@@ -3456,6 +3499,7 @@
             "conflict": {
                 "brianium/paratest": "<7.3.0 || >=8.0.0",
                 "laravel/framework": "<11.11.0 || >=12.0.0",
+                "laravel/serializable-closure": "<1.3.0 || >=2.0.0",
                 "nunomaduro/collision": "<8.0.0 || >=9.0.0",
                 "phpunit/phpunit": "<10.5.0 || 11.0.0 || >=11.4.0"
             },
@@ -3521,20 +3565,20 @@
                 "issues": "https://github.com/orchestral/testbench/issues",
                 "source": "https://github.com/orchestral/testbench-core"
             },
-            "time": "2024-08-14T05:55:35+00:00"
+            "time": "2024-08-26T05:01:33+00:00"
         },
         {
             "name": "orchestra/workbench",
-            "version": "v9.5.0",
+            "version": "v9.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/workbench.git",
-                "reference": "db7ba7a09d5e3f6bc6cbbea44d58aa18c10ab08f"
+                "reference": "4bb12d505f24b450d1693e88faddc44a1c835907"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/workbench/zipball/db7ba7a09d5e3f6bc6cbbea44d58aa18c10ab08f",
-                "reference": "db7ba7a09d5e3f6bc6cbbea44d58aa18c10ab08f",
+                "url": "https://api.github.com/repos/orchestral/workbench/zipball/4bb12d505f24b450d1693e88faddc44a1c835907",
+                "reference": "4bb12d505f24b450d1693e88faddc44a1c835907",
                 "shasum": ""
             },
             "require": {
@@ -3544,7 +3588,7 @@
                 "laravel/tinker": "^2.9",
                 "nunomaduro/collision": "^8.0",
                 "orchestra/canvas": "^9.1",
-                "orchestra/testbench-core": "^9.2",
+                "orchestra/testbench-core": "^9.4",
                 "php": "^8.1",
                 "spatie/laravel-ray": "^1.35",
                 "symfony/polyfill-php83": "^1.28",
@@ -3585,9 +3629,9 @@
             ],
             "support": {
                 "issues": "https://github.com/orchestral/workbench/issues",
-                "source": "https://github.com/orchestral/workbench/tree/v9.5.0"
+                "source": "https://github.com/orchestral/workbench/tree/v9.6.0"
             },
-            "time": "2024-08-14T00:24:43+00:00"
+            "time": "2024-08-26T05:38:42+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -9995,9 +10039,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2",
-        "ext-libxml": "*",
-        "ext-dom": "*"
+        "php": "^8.2"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"

@@ -19,7 +19,7 @@ class AssetHelper extends Helper
 
     public function process(HtmlElement $element) : void
     {
-        $asset = $element->getAttribute('asset');
+        $asset = trim($element->getAttribute('asset'));
 
         $element->removeAttribute('asset');
 
@@ -31,7 +31,7 @@ class AssetHelper extends Helper
             $attr = "href";
         }
 
-        if (trim($asset)[0] !== '$') {
+        if (!str_starts_with($asset, '$') && !str_ends_with($asset, ')')) {
             $asset = "'$asset'";
         }
 

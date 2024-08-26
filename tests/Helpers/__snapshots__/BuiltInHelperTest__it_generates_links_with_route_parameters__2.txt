@@ -1,5 +1,5 @@
 <div><div>
     <div>
-        <a route="route_with_parameters" :route-parameters="[1, 2]">This will link to a route</a>
+        <a :route-parameters="[1, 2]" href="http://localhost/route/1/2"></a>
     </div>
 </div></div>

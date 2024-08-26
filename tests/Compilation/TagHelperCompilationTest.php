@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Schivei\TagHelper\Tests\Compilation;
 
 use Illuminate\Support\Facades\View;
-use Schivei\TagHelper\Helpers\AssetHelper;
-use Schivei\TagHelper\Tests\TestCase;
 use Schivei\TagHelper\Facades\TagHelper;
+use Schivei\TagHelper\Helpers\AssetHelper;
+use Schivei\TagHelper\Tests\Compilation\Tags\AttributeTag;
 use Schivei\TagHelper\Tests\Compilation\Tags\EmailTag;
 use Schivei\TagHelper\Tests\Compilation\Tags\RegularTag;
 use Schivei\TagHelper\Tests\Compilation\Tags\ViewDataTag;
-use Schivei\TagHelper\Tests\Compilation\Tags\AttributeTag;
+use Schivei\TagHelper\Tests\TestCase;
 
 class TagHelperCompilationTest extends TestCase
 {
@@ -26,7 +26,7 @@ class TagHelperCompilationTest extends TestCase
     {
         TagHelper::helper(AssetHelper::class);
 
-        $this->assertMatchesViewSnapshot('asset_attribute');
+        $this->assertMatchesViewSnapshot('asset_attribute', ['video' => 'video.mp4']);
     }
 
     /** @test */

@@ -3,11 +3,15 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Html;
 
-use DOMDocument;
-use DOMElement;
-use DOMException;
-use DOMNode;
-use FluentDOM\Loader\Options;
+use PHPHtmlParser\Dom;
+use PHPHtmlParser\Dom\HtmlNode;
+use PHPHtmlParser\Dom\TextNode;
+use PHPHtmlParser\Exceptions\ChildNotFoundException;
+use PHPHtmlParser\Exceptions\CircularException;
+use PHPHtmlParser\Exceptions\LogicalException;
+use PHPHtmlParser\Exceptions\NotLoadedException;
+use PHPHtmlParser\Exceptions\StrictException;
+use PHPHtmlParser\Exceptions\UnknownChildTypeException;
 
 /**
  * Class HtmlElement
@@ -15,16 +19,16 @@ use FluentDOM\Loader\Options;
  */
 class HtmlElement
 {
-    protected DOMElement $domNode;
+    protected HtmlNode $domNode;
 
-    protected DOMDocument $doc;
+    protected Dom $doc;
 
-    public static function create(DOMDocument &$doc, DOMElement &$node) : self
+    public static function create(Dom &$doc, HtmlNode &$node): self
     {
         return new static($doc, $node);
     }
 
-    public function __construct(DOMDocument &$doc, DOMElement &$domNode)
+    public function __construct(Dom &$doc, HtmlNode &$domNode)
     {
         $this->doc = &$doc;
         $this->domNode = &$domNode;
@@ -53,9 +57,9 @@ class HtmlElement
         return (!empty($result) ? $result : $default) ?? "'$attribute'";
     }
 
-    public function setAttribute(string $attribute, string $value) : void
+    public function setAttribute(string $attribute, $value): void
     {
-        $this->domNode->setAttribute($attribute, $value);
+        $attr = $this->domNode->setAttribute($attribute, $value);
     }
 
     public function removeAttribute(string $attribute) : void
@@ -63,70 +67,194 @@ class HtmlElement
         $this->domNode->removeAttribute($attribute);
     }
 
+    /**
+     * @throws UnknownChildTypeException
+     * @throws ChildNotFoundException
+     */
     public function getOuterHtml() : string
     {
-        return $this->doc->saveHTML($this->domNode);
+        return $this->domNode->outerHtml();
     }
 
+    /**
+     * @throws CircularException
+     * @throws ChildNotFoundException
+     * @throws StrictException
+     * @throws NotLoadedException
+     */
+    public function setBefore(string $html): void
+    {
+        $doc = new Dom();
+        $doc->loadStr("<root_dom>$html</root_dom>");
+
+        $elements = $doc->find('root_dom')[0]->getChildren();
+
+        foreach ($elements as $element) {
+            $this->domNode->parent->insertBefore($element, $this->domNode->id());
+        }
+    }
+
+    /**
+     * @throws CircularException
+     * @throws ChildNotFoundException
+     * @throws StrictException
+     * @throws NotLoadedException
+     */
+    public function setAfter(string $html): void
+    {
+        $doc = new Dom();
+        $doc->loadStr("<root_dom>$html</root_dom>");
+
+        $elements = $doc->find('root_dom')[0]->getChildren();
+
+        foreach ($elements as $element) {
+            $this->domNode->parent->insertAfter($element, $this->domNode->id());
+        }
+    }
+
+    /**
+     * @throws CircularException
+     * @throws ChildNotFoundException
+     * @throws StrictException
+     * @throws NotLoadedException
+     */
     public function setOuterHtml(string $html) : void
     {
-        $fragment = $this->doc->createDocumentFragment();
-        $fragment->appendXML($html);
+        $doc = new Dom();
+        $doc->loadStr("<root_dom>$html</root_dom>");
 
-        $this->domNode->replaceWith($fragment);
-    }
+        $elements = $doc->find('root_dom')[0]->getChildren();
 
-    public function getInnerHtml() : string
-    {
-        $inners = [];
+        $id = $this->domNode->id();
+        foreach ($elements as $element) {
+            $this->domNode->parent->insertAfter($element, $id);
+            $id = $element->id();
 
-        foreach ($this->domNode->childNodes as $child) {
-            $inners[] = $this->doc->saveHTML($child);
+            if (!isset($el) && $element instanceof HtmlNode) {
+                $el = $element;
+            }
         }
 
-        return implode("\n", $inners);
+        $this->domNode->delete();
+
+        if (isset($el)) {
+            $this->domNode = &$el;
+        } else {
+            unset($this->domNode);
+        }
     }
 
+    /**
+     * @throws UnknownChildTypeException
+     * @throws ChildNotFoundException
+     */
+    public function getInnerHtml() : string
+    {
+        return $this->domNode->innerHtml();
+    }
+
+    /**
+     * @throws ChildNotFoundException
+     * @throws NotLoadedException
+     * @throws CircularException
+     * @throws StrictException
+     */
     public function setInnerHtml(string $html) : void
     {
-        $fragment = $this->doc->createDocumentFragment();
-        $fragment->appendXML($html);
+        $doc = new Dom();
+        $doc->loadStr("<root_dom>$html</root_dom>");
 
-        $this->domNode->nodeValue = '';
-        $this->domNode->appendChild($fragment);
+        $elements = $doc->find('root_dom')[0]->getChildren();
+
+        $this->clearChildren();
+
+        foreach ($elements as /** @type HtmlNode $element */ $element) {
+            $this->domNode->addChild($element);
+        }
     }
 
+    /**
+     * @throws ChildNotFoundException
+     * @throws NotLoadedException
+     * @throws CircularException
+     * @throws StrictException
+     */
     public function appendHtml(string $html) : void
     {
-        $fragment = $this->doc->createDocumentFragment();
-        $fragment->appendXML($html);
+        $doc = new Dom();
+        $doc->loadStr("<root_dom>$html</root_dom>");
 
-        $this->domNode->appendChild($fragment);
+        $elements = $doc->find('root_dom')[0]->getChildren();
+
+        foreach ($elements as /** @type HtmlNode $element */ $element) {
+            $this->domNode->addChild($element);
+        }
     }
 
+    /**
+     * @throws ChildNotFoundException
+     * @throws NotLoadedException
+     * @throws CircularException
+     * @throws StrictException
+     */
     public function prependHtml(string $html) : void
     {
-        $fragment = $this->doc->createDocumentFragment();
-        $fragment->appendXML($html);
+        $doc = new Dom();
+        $doc->loadStr("<root_dom>$html</root_dom>");
 
-        $this->domNode->insertBefore($fragment, $this->domNode->firstChild);
+        $elements = $doc->find('root_dom')[0]->getChildren();
+
+        $firstChild = $this->domNode->firstChild();
+
+        foreach ($elements as /** @type HtmlNode $element */ $element) {
+            $this->domNode->insertBefore($element, $firstChild->id());
+        }
     }
 
     public function getInnerText(): string
     {
-        return $this->domNode->textContent;
+        return $this->domNode->text();
     }
 
+    /**
+     * @throws LogicalException
+     * @throws CircularException
+     * @throws ChildNotFoundException
+     */
     public function setInnerText(string $text) : void
     {
-        $this->domNode->textContent = $text;
+        $txt = new TextNode($text, false);
+
+        $this->clearChildren();
+
+        $this->domNode->addChild($txt);
     }
 
+    /**
+     * @throws CircularException
+     */
+    public function clearChildren(): void
+    {
+        foreach ($this->domNode->getChildren() as /** @type HtmlNode $child */ $child) {
+            $this->domNode->removeChild($child->id());
+        }
+    }
+
+    /**
+     * @throws CircularException
+     * @throws ChildNotFoundException
+     * @throws LogicalException
+     */
     public function prependInnerText(string $prepend) : void
     {
         $this->setInnerText($prepend.$this->getInnerText());
     }
 
+    /**
+     * @throws CircularException
+     * @throws ChildNotFoundException
+     * @throws LogicalException
+     */
     public function appendInnerText(string $append) : void
     {
         $this->setInnerText($this->getInnerText().$append);
@@ -134,25 +262,25 @@ class HtmlElement
 
     public function getTag() : string
     {
-        return $this->domNode->nodeName;
+        return $this->domNode->getTag()->name();
     }
 
     /**
-     * @throws DOMException
+     * @throws CircularException
+     * @throws ChildNotFoundException
      */
     public function setTag(string $tag) : void
     {
-        $el = $this->doc->createElement($tag);
+        $node = new HtmlNode($tag);
 
-        foreach ($this->domNode->childNodes as $child) {
-            $el->appendChild($child->cloneNode(true));
+        foreach ($this->domNode->getAttributes() as $key => $value) {
+            $node->setAttribute($key, $value);
         }
 
-        foreach ($this->domNode->attributes as $attribute) {
-            $el->setAttribute($attribute->nodeName, $attribute->nodeValue);
-        }
+        $this->domNode->parent->insertAfter($node, $this->domNode->id());
+        $this->domNode->delete();
 
-        $this->domNode->parentNode->replaceChild($el, $this->domNode);
+        $this->domNode = &$node;
     }
 
     public function __toString() : string

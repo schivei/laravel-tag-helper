@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper;
 
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMXPath;
-use Exception;
-use FluentDOM\Loader\Options;
 use Illuminate\Filesystem\Filesystem;
+use PHPHtmlParser\Dom;
+use PHPHtmlParser\Dom\HtmlNode;
+use PHPHtmlParser\Exceptions\ChildNotFoundException;
+use PHPHtmlParser\Exceptions\CircularException;
+use PHPHtmlParser\Exceptions\NotLoadedException;
+use PHPHtmlParser\Exceptions\StrictException;
 use Schivei\TagHelper\Html\HtmlElement;
 
 /**
@@ -67,14 +67,14 @@ class TagHelperCompiler
      */
     protected function getTagSelector(Helper $tagHelper): string
     {
-        $elements = explode('|', $tagHelper->getTargetElement());
-        return implode('|', array_map(function ($element) use ($tagHelper) {
-            $selector = "//$element";
-            if (!is_null($tagHelper->getTargetAttribute())) {
-                $selector .= "[@{$tagHelper->getTargetAttribute()}]";
-            }
+        $element = $tagHelper->getTargetElement();
 
-            return $selector;
+        $elements = explode('|', $element);
+
+        $attribute = $tagHelper->getTargetAttribute();
+
+        return implode(',', array_map(function ($element) use ($attribute) {
+            return !empty($attribute) ? "{$element}[$attribute]" : $element;
         }, $elements));
     }
 
@@ -84,27 +84,36 @@ class TagHelperCompiler
      * @param string $viewContents
      * @param Helper $tagHelper
      * @return string
+     *
+     * @throws ChildNotFoundException|CircularException|StrictException|NotLoadedException
      */
     protected function parseHtml(string $viewContents, Helper $tagHelper) : string
     {
-        $doc = new DOMDocument();
+        $doc = new Dom();
 
-        $doc->loadHTML($viewContents, LIBXML_HTML_NOIMPLIED | LIBXML_NOERROR | LIBXML_NOWARNING);
+        $doc->loadStr($viewContents, [
+            'removeScripts' => false,
+            'removeStyles' => false,
+            'removeSmartyScripts' => false,
+            'strict' => false,
+            'preserveLineBreaks' => true,
+            'removeDoubleSpace' => false,
+        ]);
 
-        $selector = new DOMXPath($doc);
+        $elements = $doc->find($this->getTagSelector($tagHelper));
 
-        $elements = $selector->query($this->getTagSelector($tagHelper));
+        $content = $viewContents;
 
-        foreach ($elements as /** @type DOMElement $element */ $element) {
-            $el = HtmlElement::create($doc,$element);
+        if ($elements->count() > 0) {
+            foreach ($elements as /** @type HtmlNode $element */ $element) {
+                $el = HtmlElement::create($doc, $element);
 
-            $tagHelper->process($el);
+                $tagHelper->process($el);
+            }
+
+            $content = (string)$doc;
         }
 
-        $content = FluentDOM($doc->documentElement)->outerHtml();
-
-        $content = str_replace(['%7B%7B%20', '%20%7D%7D', '%7B%7B', '%7D%7D'], ['{{ ', ' }}', '{{', '}}'], $content);
-
-        return empty($content) ? $viewContents : $content;
+        return $content;
     }
 }
