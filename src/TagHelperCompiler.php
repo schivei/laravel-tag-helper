@@ -3,13 +3,9 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper;
 
+use Exception;
 use Illuminate\Filesystem\Filesystem;
-use PHPHtmlParser\Dom;
-use PHPHtmlParser\Dom\HtmlNode;
-use PHPHtmlParser\Exceptions\ChildNotFoundException;
-use PHPHtmlParser\Exceptions\CircularException;
-use PHPHtmlParser\Exceptions\NotLoadedException;
-use PHPHtmlParser\Exceptions\StrictException;
+use Schivei\TagHelper\Html\HtmlDocument;
 use Schivei\TagHelper\Html\HtmlElement;
 
 /**
@@ -60,12 +56,11 @@ class TagHelperCompiler
     }
 
     /**
-     * Get the tag selector for the helper.
-     *
+     * @param HtmlDocument $doc
      * @param Helper $tagHelper
-     * @return string
+     * @return HtmlElement[]
      */
-    protected function getTagSelector(Helper $tagHelper): string
+    protected function getElements(HtmlDocument $doc, Helper $tagHelper): array
     {
         $element = $tagHelper->getTargetElement();
 
@@ -73,9 +68,7 @@ class TagHelperCompiler
 
         $attribute = $tagHelper->getTargetAttribute();
 
-        return implode(',', array_map(function ($element) use ($attribute) {
-            return !empty($attribute) ? "{$element}[$attribute]" : $element;
-        }, $elements));
+        return $doc->find($elements, $attribute);
     }
 
     /**
@@ -85,35 +78,26 @@ class TagHelperCompiler
      * @param Helper $tagHelper
      * @return string
      *
-     * @throws ChildNotFoundException|CircularException|StrictException|NotLoadedException
+     * @throws Exception
      */
     protected function parseHtml(string $viewContents, Helper $tagHelper) : string
     {
-        $doc = new Dom();
+        $doc = HtmlDocument::parse($viewContents);
 
-        $doc->loadStr($viewContents, [
-            'removeScripts' => false,
-            'removeStyles' => false,
-            'removeSmartyScripts' => false,
-            'strict' => false,
-            'preserveLineBreaks' => true,
-            'removeDoubleSpace' => false,
-        ]);
+        $elements = $this->getElements($doc, $tagHelper);
 
-        $elements = $doc->find($this->getTagSelector($tagHelper));
-
-        $content = $viewContents;
-
-        if ($elements->count() > 0) {
-            foreach ($elements as /** @type HtmlNode $element */ $element) {
-                $el = HtmlElement::create($doc, $element);
-
-                $tagHelper->process($el);
-            }
-
-            $content = (string)$doc;
+        if (empty($elements)) {
+            return $viewContents;
         }
 
-        return $content;
+        if (isset($elements[0]) && is_array($elements[0])) {
+            $elements = array_merge(...$elements);
+        }
+
+        foreach ($elements as $element) {
+            $tagHelper->process($element);
+        }
+
+        return (string)$doc;
     }
 }

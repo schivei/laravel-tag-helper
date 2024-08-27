@@ -19,7 +19,13 @@ class AssetHelper extends Helper
 
     public function process(HtmlElement $element) : void
     {
-        $asset = trim($element->getAttribute('asset'));
+        $attr = $element->getAttribute('asset');
+
+        if ($attr === null) {
+            return;
+        }
+
+        $asset = trim($attr);
 
         $element->removeAttribute('asset');
 

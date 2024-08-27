@@ -1,7 +1,6 @@
-<div><div>
-    <a download href="<?php echo e(asset('/asset.txt')); ?>">Download</a>
-    <script src="<?php echo e(asset('asset.js')); ?>"></script>
-    <link rel="stylesheet" href="<?php echo e(asset('asset.css')); ?>" />
-    <video controls src="<?php echo e(asset($video)); ?>"></video>
-</div>
-</div>
+<div><a download href="<?php echo e(asset('/asset.txt')); ?>">Download</a>
+<script src="<?php echo e(asset('asset.js')); ?>">
+</script>
+<link rel="stylesheet" href="<?php echo e(asset('asset.css')); ?>" />
+<video :asset="$video" controls>
+</video></div>

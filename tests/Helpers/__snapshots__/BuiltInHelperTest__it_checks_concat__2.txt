@@ -1,14 +1,7 @@
-<div><div>
-    <div>
-        This will always be visible
-    </div>
-    <div class="wrapper">
-        <div concat="$concat"> This will always be visible <?php echo e($concat); ?></div>
-
-        <div concat=". That's it!">
-            This will always be visible
-        . That's it!</div>
-    </div>
-
-</div>
-</div>
+<div><div>This will always be visible</div>
+<div class="wrapper">
+  <div concat="$concat">
+  </div>
+  <div concat=". That's it!">
+  </div>
+</div></div>

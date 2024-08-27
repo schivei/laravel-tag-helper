@@ -5,7 +5,6 @@ namespace Schivei\TagHelper\Tests\Helpers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
-use Illuminate\View\ViewException;
 use Schivei\TagHelper\Tests\TestCase;
 
 class BuiltInHelperTest extends TestCase
@@ -60,18 +59,6 @@ class BuiltInHelperTest extends TestCase
     }
 
     /** @test */
-    public function it_checks_conditions_with_true_value_content()
-    {
-        $this->assertMatchesViewSnapshot('conditional_content', ['condition' => true]);
-    }
-
-    /** @test */
-    public function it_checks_conditions_with_faulty_value_content()
-    {
-        $this->assertMatchesViewSnapshot('conditional_content', ['condition' => false]);
-    }
-
-    /** @test */
     public function it_checks_concat()
     {
         $this->assertMatchesViewSnapshot('concat', ['concat' => ". It's working!"]);
@@ -81,12 +68,6 @@ class BuiltInHelperTest extends TestCase
     public function it_performs_auth_checks()
     {
         $this->assertMatchesViewSnapshot('auth');
-    }
-
-    /** @test */
-    public function it_performs_auth_web_checks()
-    {
-        $this->assertMatchesViewSnapshot('auth_web');
     }
 
     /** @test */

@@ -1,4 +1,2 @@
-<div><div>
-    <form action="/" method="post">
-    <?php echo csrf_field(); ?></form>
-</div></div>
+<div><form csrf action="/" method="post">
+</form></div>

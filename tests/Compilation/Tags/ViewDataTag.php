@@ -14,7 +14,7 @@ class ViewDataTag extends Helper
 
     public function process(HtmlElement $element) : void
     {
-        $element->appendInnerText('{{'.$element->getAttribute('view-data').'}}');
+        $element->appendText('{{' . $element->getAttribute('view-data') . '}}');
         $element->removeAttribute('view-data');
     }
 }

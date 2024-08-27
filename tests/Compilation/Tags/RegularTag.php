@@ -14,7 +14,7 @@ class RegularTag extends Helper
 
     public function process(HtmlElement $element) : void
     {
-        $element->appendInnerText('Processed');
+        $element->appendText('Processed');
         $element->removeAttribute('custom-helper');
     }
 }

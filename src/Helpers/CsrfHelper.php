@@ -20,6 +20,6 @@ class CsrfHelper extends Helper
     {
         $element->removeAttribute('csrf');
 
-        $element->appendInnerText('@csrf');
+        $element->appendText('@csrf');
     }
 }
