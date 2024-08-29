@@ -16,12 +16,11 @@ class AssetHelper extends Helper
 {
     protected string $targetAttribute = 'asset';
     protected string $targetElement = 'a|area|base|link|audio|embed|iframe|img|input|script|source|track|video';
-    protected bool $autoRemoveAttribute = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $attr = $element->getBladeAttribute('asset');
 

@@ -15,11 +15,12 @@ class FormMethodHelper extends Helper
 {
     protected string $targetAttribute = 'method';
     protected string $targetElement = 'form';
+    protected bool $autoRemoveAttribute = false;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $method = strtolower($element->getAttribute('method'));
 

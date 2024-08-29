@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper;
 
+use Exception;
 use Schivei\TagHelper\Html\HtmlElement;
 
 /**
@@ -30,7 +31,7 @@ abstract class Helper
      *
      * @var bool
      */
-    protected bool $autoRemoveAttribute = false;
+    protected bool $autoRemoveAttribute = true;
 
     /**
      * Whether the target attribute is a boolean attribute
@@ -41,30 +42,33 @@ abstract class Helper
 
     /**
      * Get the target element for this helper
-     *
      * @return string The target element for this helper
+     *@internal This method should not be overridden
+     *
      */
-    final public function getTargetElement(): string
+    public final function getTargetElement(): string
     {
         return $this->targetElement;
     }
 
     /**
      * Get the target attribute for this helper
-     *
      * @return string The target attribute for this helper
+     *@internal This method should not be overridden
+     *
      */
-    final public function getTargetAttribute(): string
+    public final function getTargetAttribute(): string
     {
         return $this->targetAttribute;
     }
 
     /**
      * Get whether to automatically remove the target attribute after processing
-     *
      * @return bool
+     * @internal This method should not be overridden
+     *
      */
-    final public function getAutoRemoveAttribute(): bool
+    public final function getAutoRemoveAttribute(): bool
     {
         return $this->autoRemoveAttribute;
     }
@@ -74,10 +78,38 @@ abstract class Helper
      *
      * @param HtmlElement $element The element to process
      * @return void
+     * @throws Exception
      */
-    abstract public function process(HtmlElement &$element): void;
+    abstract protected function _process(HtmlElement &$element): void;
 
-    public function canBeEmpty(): bool
+    /**
+     * Process the element
+     * @internal This method should not be overridden
+     *
+     * @param HtmlElement $element The element to process
+     * @return void
+     * @throws Exception
+     */
+    public final function process(HtmlElement &$element): void
+    {
+        $element->setHelper($this);
+
+        $this->_process($element);
+
+        if ($this->autoRemoveAttribute) {
+            $element->removeAttribute($this->targetAttribute);
+        }
+
+        $element->removeHelper();
+    }
+
+    /**
+     * Get whether the target attribute is a boolean attribute
+     * @return bool
+     * @internal This method should not be overridden
+     *
+     */
+    public final function canBeEmpty(): bool
     {
         return $this->canBeEmpty;
     }

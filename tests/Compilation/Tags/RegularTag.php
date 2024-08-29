@@ -11,11 +11,12 @@ class RegularTag extends Helper
 {
     protected string $targetElement = 'div';
     protected string $targetAttribute = 'custom-helper';
+    protected bool $autoRemoveAttribute = false;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $outer = $element->getOuterHtml();
 

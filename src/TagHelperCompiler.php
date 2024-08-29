@@ -74,7 +74,6 @@ class TagHelperCompiler
         }
 
         foreach ($elements as &$element) {
-            $element->setHelper($tagHelper);
             $tagHelper->process($element);
         }
 

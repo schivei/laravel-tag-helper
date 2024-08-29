@@ -14,13 +14,12 @@ use Schivei\TagHelper\Html\HtmlElement;
 class AuthHelper extends Helper
 {
     protected string $targetAttribute = 'auth';
-    protected bool $autoRemoveAttribute = true;
     protected bool $canBeEmpty = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $auth = $element->getBladeAttribute('auth');
 

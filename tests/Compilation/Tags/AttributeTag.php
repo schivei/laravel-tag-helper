@@ -10,12 +10,11 @@ use Schivei\TagHelper\Html\HtmlElement;
 class AttributeTag extends Helper
 {
     protected string $targetAttribute = 'custom-helper';
-    protected bool $autoRemoveAttribute = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $element->setInnerHtml("Processed 0");
 

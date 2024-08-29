@@ -14,13 +14,12 @@ use Schivei\TagHelper\Html\HtmlElement;
 class GuestHelper extends Helper
 {
     protected string $targetAttribute = 'guest';
-    protected bool $autoRemoveAttribute = true;
     protected bool $canBeEmpty = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $guest = $element->getBladeAttribute('guest');
 

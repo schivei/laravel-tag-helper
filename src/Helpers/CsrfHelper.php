@@ -15,12 +15,11 @@ class CsrfHelper extends Helper
 {
     protected string $targetAttribute = 'csrf';
     protected string $targetElement = 'form';
-    protected bool $autoRemoveAttribute = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $element->appendInnerHtml('@csrf');
     }

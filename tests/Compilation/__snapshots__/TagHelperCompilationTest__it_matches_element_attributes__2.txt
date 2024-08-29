@@ -1,7 +1,7 @@
 <div><div>
     Processed 3
 
-    <div custom-helper>Processed 6
+    <div>Processed 6
 Processed 2
 Processed 0
 Processed 1
@@ -10,7 +10,7 @@ Processed 5</div>
     Processed 4
     Processed 3
 
-    <span custom-helper>Processed 6
+    <span>Processed 6
 Processed 2
 Processed 0
 Processed 1
