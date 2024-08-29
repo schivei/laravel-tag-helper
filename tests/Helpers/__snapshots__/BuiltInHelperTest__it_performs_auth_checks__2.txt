@@ -5,7 +5,7 @@
     <div class="wrapper">
         <?php if(auth()->guard()->check()): ?>
 
-    <div auth>
+    <div>
             This will always be visible
         </div>
 
@@ -13,7 +13,7 @@
 
         <?php if(auth()->guard('web')->check()): ?>
 
-    <div auth="web">
+    <div>
             This will always be visible
         </div>
 

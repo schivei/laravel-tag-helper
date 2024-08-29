@@ -15,12 +15,11 @@ class LinkHelper extends Helper
 {
     protected string $targetElement = 'a';
     protected string $targetAttribute = 'route';
-    protected bool $autoRemoveAttribute = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $route = $element->getBladeAttribute('route');
 

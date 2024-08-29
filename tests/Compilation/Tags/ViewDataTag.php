@@ -12,11 +12,12 @@ class ViewDataTag extends Helper
     protected string $targetElement = 'div';
 
     protected string $targetAttribute = 'view-data';
+    protected bool $autoRemoveAttribute = false;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $element->appendText('{{' . $element->getAttribute('view-data') . '}}');
         $element->removeAttribute('view-data');

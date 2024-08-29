@@ -14,12 +14,11 @@ use Schivei\TagHelper\Html\HtmlElement;
 class ConditionHelper extends Helper
 {
     protected string $targetAttribute = 'if';
-    protected bool $autoRemoveAttribute = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement &$element): void
+    protected function _process(HtmlElement &$element): void
     {
         $condition = $element->getBladeAttribute('if');
 

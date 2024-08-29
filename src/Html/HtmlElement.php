@@ -322,4 +322,9 @@ final class HtmlElement
             unset($this->$property);
         }
     }
+
+    public function removeHelper(): void
+    {
+        unset($this->_helper);
+    }
 }
