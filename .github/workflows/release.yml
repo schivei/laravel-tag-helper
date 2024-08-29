@@ -1,0 +1,36 @@
+on:
+    workflow_run:
+        workflows: [ "Tagger" ]
+        types:
+            - completed
+        tags:
+            - 'v*'
+
+name: Release
+
+jobs:
+    build:
+        name: Create Release
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@master
+
+            -   name: Update CHANGELOG
+                id: changelog
+                uses: requarks/changelog-action@v1
+                with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    tag: ${{ github.ref }}
+
+            -   name: Create Release
+                id: create_release
+                uses: actions/create-release@latest
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    tag_name: ${{ github.ref }}
+                    release_name: Release ${{ github.ref }}
+                    body: ${{ steps.changelog.outputs.changes }}
+                    draft: false
+                    prerelease: false
