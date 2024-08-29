@@ -152,7 +152,31 @@ final class HtmlDocument
             $this->_content = str_replace($key, $protectedValue, $this->_content);
         }
 
-        return $this->_content;
+        return $this->_unprotect($this->_content);
+    }
+
+    private function _unprotect(string $value): string
+    {
+        $replacers = [
+            '___NEW_LINE___' => "\n",
+            '___SPACE___' => '  ',
+        ];
+
+        $value = str_replace(array_keys($replacers), array_values($replacers), $value);
+
+        foreach ($this->_protectedValues as $key => $protectedValue) {
+            $value = str_replace($key, $protectedValue, $value);
+        }
+
+        $decorations = '/
+            (P?<decoration>___PROTECTED_VALUE_|___NEW_LINE___|___SPACE___)
+        /isx';
+
+        if (!preg_match($decorations, $value)) {
+            return $value;
+        }
+
+        return $this->_unprotect($value);
     }
 
     /**
