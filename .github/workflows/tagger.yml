@@ -2,7 +2,7 @@ name: Tagger
 
 on:
     workflow_run:
-        workflows: [ "Release" ]
+        workflows: [ "Compiler" ]
         types:
             - completed
         branches:
