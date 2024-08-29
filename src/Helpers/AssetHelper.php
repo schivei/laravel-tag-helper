@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use Exception;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -13,34 +14,27 @@ use Schivei\TagHelper\Html\HtmlElement;
  */
 class AssetHelper extends Helper
 {
-    protected ?string $targetAttribute = 'asset';
-
+    protected string $targetAttribute = 'asset';
     protected string $targetElement = 'a|area|base|link|audio|embed|iframe|img|input|script|source|track|video';
+    protected bool $autoRemoveAttribute = true;
 
-    public function process(HtmlElement $element) : void
+    /**
+     * @throws Exception
+     */
+    public function process(HtmlElement &$element): void
     {
-        $attr = $element->getAttribute('asset');
+        $attr = $element->getBladeAttribute('asset');
 
-        if ($attr === null) {
-            return;
-        }
-
-        $asset = trim($attr);
-
-        $element->removeAttribute('asset');
+        $asset = trim("$attr");
 
         $elementName = $element->getTag();
 
-        $attr = "src";
+        $dest = "src";
 
         if (in_array($elementName, ['a', 'area', 'base', 'link'])) {
-            $attr = "href";
+            $dest = "href";
         }
 
-        if (!str_starts_with($asset, '$') && !str_ends_with($asset, ')')) {
-            $asset = "'$asset'";
-        }
-
-        $element->setAttribute($attr, "{{ asset($asset) }}");
+        $element->setAttribute($dest, "{{ asset($asset) }}");
     }
 }

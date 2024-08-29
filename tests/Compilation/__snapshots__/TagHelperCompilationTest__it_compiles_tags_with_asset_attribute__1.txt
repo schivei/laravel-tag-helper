@@ -1,6 +1,6 @@
-<a download href="http://localhost/asset.txt">Download</a>
-<script src="http://localhost/asset.js">
-</script>
-<link rel="stylesheet" href="http://localhost/asset.css" />
-<video :asset="$video" controls>
-</video>
+<div>
+    <a asset="/asset.txt" download href="http://localhost/asset.txt">Download</a>
+    <script src="http://localhost/asset.js"></script>
+    <link asset="asset.css" rel="stylesheet" href="http://localhost/asset.css" />
+    <video controls src="http://localhost/video.mp4"></video>
+</div>

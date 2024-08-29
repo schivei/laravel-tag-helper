@@ -1,1 +1,4 @@
-<div><div><?php echo e($data); ?></div></div>
+<div><div>
+    <div>
+<?php echo e($data); ?></div>
+</div></div>

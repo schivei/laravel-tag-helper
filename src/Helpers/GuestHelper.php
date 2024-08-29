@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use Exception;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -12,22 +13,18 @@ use Schivei\TagHelper\Html\HtmlElement;
  */
 class GuestHelper extends Helper
 {
-    protected ?string $targetAttribute = 'guest';
+    protected string $targetAttribute = 'guest';
+    protected bool $autoRemoveAttribute = true;
+    protected bool $canBeEmpty = true;
 
-    public function process(HtmlElement $element) : void
+    /**
+     * @throws Exception
+     */
+    public function process(HtmlElement &$element): void
     {
-        $guest = $element->getAttributeForBlade('guest');
+        $guest = $element->getBladeAttribute('guest');
 
-        if (empty($guest) || "'guest'" === $guest || "':guest'" === $guest) {
-            $guest = null;
-        }
-
-        $element->removeAttribute('guest');
-
-        $outerHtml = '@guest('.$guest.') ';
-        $outerHtml .= $element->getOuterHtml();
-        $outerHtml .= ' @endguest';
-
-        $element->setOuterHtml($outerHtml);
+        $element->prependOuterHtml('@guest(' . $guest . ')');
+        $element->appendOuterHtml('@endguest');
     }
 }

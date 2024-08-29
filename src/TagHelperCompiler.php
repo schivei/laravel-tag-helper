@@ -6,7 +6,6 @@ namespace Schivei\TagHelper;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Schivei\TagHelper\Html\HtmlDocument;
-use Schivei\TagHelper\Html\HtmlElement;
 
 /**
  * Class TagHelperCompiler
@@ -56,22 +55,6 @@ class TagHelperCompiler
     }
 
     /**
-     * @param HtmlDocument $doc
-     * @param Helper $tagHelper
-     * @return HtmlElement[]
-     */
-    protected function getElements(HtmlDocument $doc, Helper $tagHelper): array
-    {
-        $element = $tagHelper->getTargetElement();
-
-        $elements = explode('|', $element);
-
-        $attribute = $tagHelper->getTargetAttribute();
-
-        return $doc->find($elements, $attribute);
-    }
-
-    /**
      * Parse the HTML content of the view.
      *
      * @param string $viewContents
@@ -84,20 +67,21 @@ class TagHelperCompiler
     {
         $doc = HtmlDocument::parse($viewContents);
 
-        $elements = $this->getElements($doc, $tagHelper);
+        $elements = $doc->find($tagHelper);
 
         if (empty($elements)) {
             return $viewContents;
         }
 
-        if (isset($elements[0]) && is_array($elements[0])) {
-            $elements = array_merge(...$elements);
-        }
-
-        foreach ($elements as $element) {
+        foreach ($elements as &$element) {
+            $element->setHelper($tagHelper);
             $tagHelper->process($element);
         }
 
-        return (string)$doc;
+        $content = $doc->toString();
+
+        unset($doc);
+
+        return $content;
     }
 }

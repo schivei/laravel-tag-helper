@@ -9,21 +9,151 @@ This package allows you to register custom "tag helpers" in your Laravel applica
 
 > It is a fork of [beyondcode/laravel-tag-helper](https://github.com/beyondcode/laravel-tag-helper)
 
-For example, instead of this:
+## What the difference between this package and the original one?
+
+This package is focused on element attributes, while the original proposes to implement custom elements.
+This package also has a better test coverage and a more robust codebase.
+
+To use custom elements, try to create Blade Components instead.
+
+## Why should I use this package?
+
+To create shortcuts for common HTML patterns and reduce the double bracket usage in your Blade templates.
+
+## Built-In Helpers
+
+### CSRF Token
+
+Instead of writing this:
 
 ```html
-<form method="post">
-    <input type="hidden" name="_method" value="DELETE">
+<form>
     <input type="hidden" name="_token" value="csrf-token">    
 </form>
 ```
 
-You can use custom tag helpers to turn this code into this:
+You can write this:
 
 ```html
-<form csrf method="delete">
-
+<form csrf>
 </form> 
+```
+
+### Form Method
+
+Instead of writing this:
+```html
+<form method="post">
+    <input type="hidden" name="_method" value="DELETE">
+</form>
+```
+
+You can write this:
+```html
+<form method="delete">
+</form>
+```
+
+### Link
+
+Instead of writing this:
+
+```html
+<a href="{{ route('home') }}">Home</a>
+```
+
+You can write this:
+
+```html
+<a route="home">Home</a>
+```
+
+### Assets
+
+Instead of writing this:
+
+```html
+<link href="{{ asset('asset.css') }}" .../>
+<style src="{{ asset('asset.js') }}" .../>
+<script src="{{ asset('asset.js') }}" .../>
+```
+
+You can write this:
+
+```html
+<link asset="asset.css" .../>
+<style asset="asset.js" .../>
+<script asset="asset.js" .../>
+```
+
+### Conditional Attributes
+
+Instead of writing this:
+
+```html
+@if($condition)
+    <div class="bg-red-500"></div>
+@endif
+
+@isset($condition)
+    <div class="bg-red-500"></div>
+@endisset
+
+@empty($condition)
+    <div class="bg-red-500"></div>
+@endempty
+
+@unless($condition)
+    <div class="bg-red-500"></div>
+@endunless
+```
+
+You can write this:
+
+```html
+<div class="bg-red-500" if="$condition"></div>
+
+<div class="bg-red-500" isset="$condition"></div>
+
+<div class="bg-red-500" empty="$condition"></div>
+
+<div class="bg-red-500" unless="$condition"></div>
+```
+
+NOTE: `else` and `elseif` are not supported.
+
+### Guest and Auth
+
+Instead of writing this:
+
+```html
+@auth("web")
+    <div class="bg-red-500"></div>
+@endauth
+
+@auth($what)
+<div class="bg-red-500"></div>
+@endauth
+
+@guest("web")
+    <div class="bg-red-500"></div>
+@endguest
+
+@guest($what)
+<div class="bg-red-500"></div>
+@endguest
+```
+
+You can write this:
+
+```html
+<div class="bg-red-500" auth="web"></div>
+
+<div class="bg-red-500" :auth="$what"></div>
+
+<div class="bg-red-500" guest="web"></div>
+
+<div class="bg-red-500" :guest="$what"></div>
 ```
 
 ## Installation
@@ -53,17 +183,23 @@ class CustomTagHelper extends Helper
 {
     protected $targetAttribute = 'custom';
 
-    protected $targetElement = 'div';
+    protected $targetElements = ['div'];
+    
+    protected $autoRemoveAttribute = true;
 
     public function process(HtmlElement $element)
     {
-        // Manipulate the DOM element
+        // Manipulate the element
     }
 }
 
 ```
 
-To use and apply this tag helper, you need to register it. Typically you would do this in the `AppServiceProvider boot()` method or a service provider of your own.
+To use and apply this tag helper, you need to register it.
+Typically you would do this in the `AppServiceProvider boot()` method or a service provider of your own.
+
+Pay attention, the `$autoRemoveAttribute` property is set to `false` by default.
+If you want to remove the attribute after processing, you need to set it to `true`.
 
 ```php
 TagHelper::helper(CustomTagHelper::class);
@@ -73,9 +209,12 @@ Since you only register the class name of the custom tag helper, you can use dep
 
 ### Binding your helper to HTML elements and attributes
 
-In your custom tag helper, you can use the `$targetAttribute` and `$targetElement` properties to specify which HTML element (`div`, `form`, `a`, etc.) and which attributes (`<div custom="value />`, `<form method="post">`, etc.) you want to bind this helper to.
+In your custom tag helper, you can use the `$targetAttribute` and `$targetElements` properties to specify which HTML
+element (`div`, `form`, `a`, etc.) and attributes (`<div custom="value />`, `<form method="post">`, etc.) you want to
+bind this helper to.
 
-If you do not provide a `targetElement` on your own, this package will use a `*` as a wildcard in order to target **all** elements with a specific attribute, like this:
+If you do not provide a `targetElements` on your own, this package will target to **all** elements with a specific
+attribute, like this:
 
 ```php
 class CustomTagHelper extends Helper
@@ -97,9 +236,9 @@ Inside of this method, you can manipulate the HTML element.
 
 Available features:
 
-#### Changing the HTML element tag
+#### Prepend / Append outer HTML
 
-In this example, we are binding our helper to HTML elements `<my-custom-link href="/"></my-custom-link>`. In the process method, we can then change the tag internally to `a` to render this as a link.
+You can add HTML before or after the current element.
 
 ```php
 <?php
@@ -113,9 +252,42 @@ class CustomLink extends Helper
 {
     protected $targetElement = 'my-custom-link';
 
+    protected $autoRemoveAttribute = true;
+
     public function process(HtmlElement $element)
     {
-        $element->setTag('a');
+        $element->prependOuterHtml('<div class="custom-link">');
+        
+        $element->appendOuterHtml('</div>');
+    }
+}
+```
+
+#### Prepend / Append / Replace inner HTML
+
+You can add HTML inside the current element, only if the element is not self-closing only.
+
+```php
+<?php
+
+namespace Schivei\TagHelper\Helpers;
+
+use Schivei\TagHelper\Helper;
+use Schivei\TagHelper\Html\HtmlElement;
+
+class CustomLink extends Helper
+{
+    protected $targetElement = 'my-custom-link';
+
+    protected $autoRemoveAttribute = true;
+
+    public function process(HtmlElement $element)
+    {
+        $element->prependInnerHtml('<span class="custom-link">');
+        
+        $element->appendInnerHtml('</span>');
+        
+        $element->replaceInnerHtml('<span class="custom-link">Hello</span>');
     }
 }
 ```
@@ -141,50 +313,24 @@ class CustomLink extends Helper
     
     protected $targetElement = 'a';
 
+    protected $autoRemoveAttribute = true;
+
     public function process(HtmlElement $element)
     {
         $element->setAttribute('href', route($element->getAttribute('route')));
-        
-        $element->removeAttribute('route');
         
         $element->setAttribute('title', 'This is a link.');
     }
 }
 ```
 
-#### Manipulating Outer / Inner Text
-
-Your custom tag helpers can you manipulate the HTML that is inside or outside of the current element. 
-
-```php
-<?php
-
-namespace Schivei\TagHelper\Helpers;
-
-use Schivei\TagHelper\Helper;
-use Schivei\TagHelper\Html\HtmlElement;
-
-class CustomLink extends Helper
-{
-    protected $targetAttribute = 'add-hidden-field';
-    
-    protected $targetElement = 'form';
-
-    public function process(HtmlElement $element)
-    {
-        $element->removeAttribute('add-hidden-field');
-        
-        $element->appendInnerText('<input type="hidden" name="hidden" />');
-    }
-}
-```
-
 ### Passing variables to your tag helpers
 
-You can pass attribute values to your tag helpers  as you would usually pass attributes to HTML elements.
+You can pass attribute values to your tag helpers as you would usually pass attributes to HTML elements.
 Since the modifications of your tag helpers get cached, you should always return valid Blade template output in your modified attribute values.
 
-You can **not** directly access the variable content inside of your tag helper, but only get the attribute string representation.
+You can **not** directly access the variable content inside your tag helper, but only get the attribute string
+representation.
 
 For example, to get the attribute value of the `method` attribute:
 
@@ -216,13 +362,14 @@ class CustomForm extends Helper
 If you want to write Blade output, you sometimes need to know if the user passed a variable or function call, or a string value.
 To tell the difference, users can pass variable data by prefixing the attribute using a colon.
 
-If you want to output this attribute into a blade template, you can then use the `getAttributeForBlade` method and it will 
+If you want to output this attribute into a blade template, you can then use the `getAttributeForBlade` method, and it
+will
 either give you an escaped string representation of the attribute - or the unescaped representation, in case it got prefixed by a colon.
 
 For example:
 
 ```html
-<a route="home">Home</a>
+<a :route="home">Home</a>
 ```
 
 ```php
@@ -268,97 +415,6 @@ This will output:
 
 This way you do not need to manually care about escaping and detecting dynamic variables.
 
-## Built-In Helpers
-
-This package ships with a couple useful tag helpers out of the box.
-
-### CSRF Helper
-
-Just add a `csrf` attribute to any `form` element to automatically add the Laravel CSRF field to it.
-
-```html
-<form csrf method="post">
-
-</form>
-```
-
-Will become:
-
-
-```html
-<form method="post">
-    <input type="hidden" name="_token" value="csrf-token">    
-</form>
-```
-
-#### Caveats
-
-`csrf` needs to be in a line with another attribute.
-
-```php
-// this works
-<form
-    csrf action="/posts"
-    class="mt-8>
-    
-// this doesn't work
-<form
-    csrf
-    action="/posts"
-    class="mt-8>
-    
-```
-
-### Form Method Helper
-
-When your `form` contains a `method` other then `GET` or `POST`, the helper will automatically add a `_method` hidden field with the correct value to your form.
-
-```html
-<form method="delete">
-
-</form>
-```
-
-Will become:
-
-
-```html
-<form method="post">
-    <input type="hidden" name="_method" value="DELETE">    
-</form>
-```
-
-### Link
-
-When your `a` tags contains a `route` attribute, this helper will change the href to the appropriate route.
-You can also provide a `route-parameters` attribute, to pass additional parameters to the route generation.
-
-Examples:
-```html
-<a route="home">Home</a>
-
-<a route="profile" :route-parameters="[$user->id()]">Home</a>
-```
-
-### Asset
-
-When your `a|area|base|link|audio|embed|iframe|img|input|script|source|track|video` tags contains an `asset` attribute, this helper will change the href/src to the appropriate route.
-
-Examples:
-```html
-<link asset="asset.css" .../>
-
-<script asset="asset.js" .../>
-```
-
-Will become:
-
-```html
-<link href="http://yourdomain.com/asset_path/asset.css" .../>
-
-<script src="http://yourdomain.com/asset_path/asset.js" .../>
-```
-
 ### Testing
 
 ``` bash
@@ -367,7 +423,8 @@ composer test
 
 ### Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [Releases](https://github.com/schivei/laravel-tag-helper/releases) for more information what has changed
+recently.
 
 ## Contributing
 

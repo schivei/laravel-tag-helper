@@ -1,7 +1,0 @@
-<div>This will always be visible</div>
-<div class="wrapper">
-  <div concat="$concat">
-  </div>
-  <div concat=". That's it!">
-  </div>
-</div>

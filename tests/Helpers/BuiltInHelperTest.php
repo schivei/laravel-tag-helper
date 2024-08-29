@@ -59,12 +59,6 @@ class BuiltInHelperTest extends TestCase
     }
 
     /** @test */
-    public function it_checks_concat()
-    {
-        $this->assertMatchesViewSnapshot('concat', ['concat' => ". It's working!"]);
-    }
-
-    /** @test */
     public function it_performs_auth_checks()
     {
         $this->assertMatchesViewSnapshot('auth');

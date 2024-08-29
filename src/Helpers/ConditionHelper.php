@@ -13,29 +13,19 @@ use Schivei\TagHelper\Html\HtmlElement;
  */
 class ConditionHelper extends Helper
 {
-    protected ?string $targetAttribute = 'if';
+    protected string $targetAttribute = 'if';
+    protected bool $autoRemoveAttribute = true;
 
     /**
      * @throws Exception
      */
-    public function process(HtmlElement $element) : void
+    public function process(HtmlElement &$element): void
     {
-        $condition = $element->getAttribute('if');
+        $condition = $element->getBladeAttribute('if');
 
-        $toContent = $element->hasAttribute('to-content');
+        $condition = preg_replace('/^([\'"])?(.*)\1$/', '$2', $condition);
 
-        $element->removeAttribute('if');
-
-        if ($toContent) {
-            $element->removeAttribute('to-content');
-
-            $element->prependHtml('@if('.$condition.')');
-            $element->appendHtml('@endif');
-
-            return;
-        }
-
-        $element->setBefore('@if(' . $condition . ')');
-        $element->setAfter('@endif');
+        $element->prependOuterHtml('@if(' . $condition . ')');
+        $element->appendOuterHtml('@endif');
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use Exception;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -12,14 +13,15 @@ use Schivei\TagHelper\Html\HtmlElement;
  */
 class CsrfHelper extends Helper
 {
-    protected ?string $targetAttribute = 'csrf';
-
+    protected string $targetAttribute = 'csrf';
     protected string $targetElement = 'form';
+    protected bool $autoRemoveAttribute = true;
 
-    public function process(HtmlElement $element) : void
+    /**
+     * @throws Exception
+     */
+    public function process(HtmlElement &$element): void
     {
-        $element->removeAttribute('csrf');
-
-        $element->appendText('@csrf');
+        $element->appendInnerHtml('@csrf');
     }
 }

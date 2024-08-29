@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use Exception;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -12,17 +13,20 @@ use Schivei\TagHelper\Html\HtmlElement;
  */
 class FormMethodHelper extends Helper
 {
-    protected ?string $targetAttribute = 'method';
-
+    protected string $targetAttribute = 'method';
     protected string $targetElement = 'form';
 
-    public function process(HtmlElement $element) : void
+    /**
+     * @throws Exception
+     */
+    public function process(HtmlElement &$element): void
     {
         $method = strtolower($element->getAttribute('method'));
 
         if ($method !== 'get' && $method !== 'post') {
+            $method = strtoupper($method);
             $element->setAttribute('method', 'post');
-            $element->appendHtml('<input type="hidden" name="_method" value="'.strtoupper($method).'" />');
+            $element->appendInnerHtml("<input type=\"hidden\" name=\"_method\" value=\"$method\" />");
         }
     }
 }
