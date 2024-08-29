@@ -1,1 +1,4 @@
-<div><div><?php echo e(sha1('test')); ?></div></div>
+<div><div>
+    <div>
+<?php echo e(sha1('test')); ?></div>
+</div></div>

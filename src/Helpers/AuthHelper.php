@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use Exception;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -12,22 +13,18 @@ use Schivei\TagHelper\Html\HtmlElement;
  */
 class AuthHelper extends Helper
 {
-    protected ?string $targetAttribute = 'auth';
+    protected string $targetAttribute = 'auth';
+    protected bool $autoRemoveAttribute = true;
+    protected bool $canBeEmpty = true;
 
-    public function process(HtmlElement $element) : void
+    /**
+     * @throws Exception
+     */
+    public function process(HtmlElement &$element): void
     {
-        $auth = $element->getAttributeForBlade('auth');
+        $auth = $element->getBladeAttribute('auth');
 
-        if (empty($auth) || "'auth'" === $auth || "':auth'" === $auth) {
-            $auth = null;
-        }
-
-        $element->removeAttribute('auth');
-
-        $outerHtml = '@auth('.$auth.') ';
-        $outerHtml .= $element->getOuterHtml();
-        $outerHtml .= ' @endauth';
-
-        $element->setOuterHtml($outerHtml);
+        $element->prependOuterHtml('@auth(' . $auth . ')');
+        $element->appendOuterHtml('@endauth');
     }
 }

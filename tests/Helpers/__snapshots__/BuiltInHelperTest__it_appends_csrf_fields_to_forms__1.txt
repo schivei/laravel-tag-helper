@@ -1,2 +1,6 @@
-<form csrf action="/" method="post">
-</form>
+<div>
+    <form action="/" method="post">
+    
+
+    <input type="hidden" name="_token" value="" autocomplete="off"></form>
+</div>

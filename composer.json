@@ -50,7 +50,7 @@
                 "Schivei\\TagHelper\\TagHelperServiceProvider"
             ],
             "aliases": {
-                "TagHelper": "Schivei\\TagHelper\\TagHelperFacade"
+                "TagHelper": "Schivei\\TagHelper\\Facades\\TagHelper"
             }
         }
     }

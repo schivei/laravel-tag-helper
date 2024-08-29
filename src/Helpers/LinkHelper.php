@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Helpers;
 
+use Exception;
 use Schivei\TagHelper\Helper;
 use Schivei\TagHelper\Html\HtmlElement;
 
@@ -13,16 +14,22 @@ use Schivei\TagHelper\Html\HtmlElement;
 class LinkHelper extends Helper
 {
     protected string $targetElement = 'a';
+    protected string $targetAttribute = 'route';
+    protected bool $autoRemoveAttribute = true;
 
-    protected ?string $targetAttribute = 'route';
-
-    public function process(HtmlElement $element) : void
+    /**
+     * @throws Exception
+     */
+    public function process(HtmlElement &$element): void
     {
-        $element->setTag('a');
+        $route = $element->getBladeAttribute('route');
 
-        $element->setAttribute('href', route($element->getAttributeForBlade('route'), json_decode($element->getAttributeForBlade('route-parameters', '[]'))));
+        $params = $element->getBladeAttribute('route-parameters', '[]');
 
-        $element->removeAttribute('route');
+        $params = preg_replace('/^([\'"])?(.*)\1$/', '$2', $params);
+
+        $element->setAttribute('href', "{{ route($route, $params) }}");
+
         $element->removeAttribute('route-parameters');
     }
 }

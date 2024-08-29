@@ -3,9 +3,14 @@
         This will always be visible
     </div>
     <div class="wrapper">
-        <div :auth="$guard">
+        <?php if(auth()->guard($guard)->check()): ?>
+
+    <div>
             This will always be visible
         </div>
+
+    <?php endif; ?>
     </div>
 
-</div></div>
+</div>
+</div>

@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\View;
 use Schivei\TagHelper\Facades\TagHelper;
 use Schivei\TagHelper\Helpers\AssetHelper;
 use Schivei\TagHelper\Tests\Compilation\Tags\AttributeTag;
-use Schivei\TagHelper\Tests\Compilation\Tags\EmailTag;
 use Schivei\TagHelper\Tests\Compilation\Tags\RegularTag;
 use Schivei\TagHelper\Tests\Compilation\Tags\ViewDataTag;
 use Schivei\TagHelper\Tests\TestCase;
@@ -75,14 +74,6 @@ class TagHelperCompilationTest extends TestCase
         TagHelper::helper(RegularTag::class);
 
         $this->assertMatchesViewSnapshot('invalid_html');
-    }
-
-    /** @test */
-    public function tags_can_change_their_own_tag()
-    {
-        TagHelper::helper(EmailTag::class);
-
-        $this->assertMatchesViewSnapshot('change_tag');
     }
 
     /** @test */

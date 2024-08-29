@@ -3,128 +3,323 @@ declare(strict_types=1);
 
 namespace Schivei\TagHelper\Html;
 
+use Exception;
+use PHPHtmlParser\Dom\HtmlNode;
 use PHPHtmlParser\Dom\TextNode;
-use PHPHtmlParser\Exceptions\ChildNotFoundException;
-use PHPHtmlParser\Exceptions\CircularException;
-use PHPHtmlParser\Exceptions\NotLoadedException;
-use PHPHtmlParser\Exceptions\StrictException;
+use Schivei\TagHelper\Helper;
 
 /**
  * Class HtmlElement
  * @package Schivei\TagHelper\Html
  */
-final class HtmlElement extends HtmlNode
+final class HtmlElement
 {
-    private bool $_initialized;
-    private string $_content;
+    private HtmlDocument $_doc;
 
-    /**
-     * @throws CircularException
-     * @throws ChildNotFoundException
-     * @throws StrictException
-     * @throws NotLoadedException
-     */
-    public function __construct(int $index, HtmlDocument &$root, ?HtmlElement &$parent, string $content, string $tagName)
+    private HtmlNode $_node;
+
+    private ?Helper $_helper = null;
+
+    public function __construct(HtmlDocument &$doc, HtmlNode &$node)
     {
-        $this->_initialized = false;
-        $this->_content = $content;
+        $this->_doc = &$doc;
+        $this->_node = &$node;
+    }
 
-        if (empty($parent)) {
-            $parent = $this;
-        }
+    public function setHelper(?Helper &$helper = null): void
+    {
+        $this->_helper = &$helper;
+    }
 
-        parent::__construct($index, $root, $parent, $content, $tagName);
-
-        $this->_initialized = true;
+    public function getTag(): string
+    {
+        return $this->_node->getTag()->name();
     }
 
     /**
-     * @inheritdoc
-     * @throws ChildNotFoundException
-     * @throws CircularException
-     * @throws StrictException
-     * @throws NotLoadedException
-     * @override
+     * @throws Exception
      */
-    public function getChildren(?string $content = null): array
+    public function getOuterHtml(): string
     {
-        if ($this->_closed) {
-            return [];
+        return $this->_node->outerHtml();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getInnerHtml(): string
+    {
+        return $this->_node->innerHtml();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function setInnerHtml(string $html): void
+    {
+        $html = $this->_doc->protectValue($html);
+
+        $this->clear();
+
+        $newInner = HtmlDocument::getDom($html)->root->getChildren();
+
+        foreach ($newInner as $child) {
+            $this->_node->addChild($child);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function prependInnerHtml(string $html): void
+    {
+        $indent = $this->getInnerSpace();
+
+        $html = $this->_doc->protectValue("$html\n$indent");
+
+        $newInner = HtmlDocument::getDom($html)->root->getChildren();
+
+        foreach ($newInner as $child) {
+            $nodeChild = $this->_node->firstChild();
+
+            $this->_node->insertBefore($child, $nodeChild->id());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function appendInnerHtml(string $html): void
+    {
+        $indent = $this->getInnerSpace();
+
+        $html = $this->_doc->protectValue("\n$indent$html");
+
+        $newInner = HtmlDocument::getDom($html)->root->getChildren();
+
+        foreach ($newInner as $child) {
+            $this->_node->addChild($child);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function prependOuterHtml(string $html): void
+    {
+        $indent = $this->getOuterSpace();
+
+        $html = $this->_doc->protectValue("$html\n$indent");
+
+        $newInner = HtmlDocument::getDom($html)->root->getChildren();
+
+        $parent = $this->_node->getParent();
+
+        foreach ($newInner as $child) {
+            $parent->insertBefore($child, $this->_node->id());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function appendOuterHtml(string $html): void
+    {
+        $indent = $this->getOuterSpace();
+
+        $html = $this->_doc->protectValue("\n$indent$html");
+
+        $newInner = HtmlDocument::getDom($html)->root->getChildren();
+
+        $parent = $this->_node->getParent();
+
+        foreach ($newInner as $child) {
+            $parent->insertAfter($child, $this->_node->id());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function hasAttribute(string $name): bool
+    {
+        return $this->_node->hasAttribute($name);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getAttribute(string $name, ?string $default = null): ?string
+    {
+        if ($this->hasAttribute($name)) {
+            return $this->_node->getAttribute($name) ?? $default;
         }
 
-        if (empty($content) || $this->_initialized) {
-            return parent::getChildren();
-        }
+        return $default;
+    }
 
-        $dom = self::_getDom($content);
+    /**
+     * @throws Exception
+     */
+    public function getBladeAttribute(string $name, ?string $default = null): ?string
+    {
+        $bladeAttr = "blade-attr-$name";
 
-        if ($dom->root->getTag()->name() !== $this->_tag) {
-            $dom = $dom->root;
-        }
+        if ($this->hasAttribute($bladeAttr)) {
+            $attr = $this->getAttribute($bladeAttr) ?? $default;
+        } else {
+            $value = $this->getAttribute($name) ?? $default;
 
-        /** @var HtmlNode $first */
-        $first = null;
+            $helperAttribute = $this->_helper?->getTargetAttribute() ?? "";
+            $canBeEmpty = $this->_helper?->canBeEmpty() ?? false;
 
-        $children = [];
-
-        foreach ($dom->getChildren() as $i => $child) {
-            if ($child instanceof TextNode) {
-                $children[] = new HtmlText($i, $this->_root, $this, $child->text(), $child->getTag()->name());
-                continue;
+            if (empty($value) && empty($default) && $name === $helperAttribute && $canBeEmpty) {
+                return $default;
             }
 
-            $first = $child;
-            break;
+            $attr = !empty($default) && $default === $value ? $value : "'$value'";
         }
 
-        if (empty($first)) {
-            return $children;
-        }
+        $replaces = [
+            '/^(=)(.*)$/' => '$2',
+            '/^(")([^"]*)(")$/' => "$2",
+        ];
 
-        foreach ($first->getChildren() as $i => $child) {
-            if ($child instanceof TextNode) {
-                $children[] = new HtmlText($i, $this->_root, $this, $child->text(), $child->getTag()->name());
-                continue;
-            }
-
-            $children[] = new HtmlElement($i, $this->_root, $this, $child->outerHtml(), $child->getTag()->name());
-        }
-
-        return $children;
+        return preg_replace(array_keys($replaces), array_values($replaces), $attr);
     }
 
     /**
-     * @throws CircularException
-     * @throws ChildNotFoundException
-     * @throws StrictException
+     * @throws Exception
      */
-    public function getAttributes(): array
+    public function setAttribute(string $name, string $value): void
     {
-        if ($this->_closed) {
-            return [];
-        }
+        $value = $this->_doc->protectValue($value);
 
-        if ($this->_initialized) {
-            return parent::getAttributes();
-        }
-
-        $dom = self::_getDom($this->_content);
-
-        $attributes = $dom->root->firstChild()->getAttributes();
-
-        foreach ($attributes as $key => $value) {
-            $attributes[$key] = !isset($value) ? true : $value;
-        }
-
-        return $attributes;
+        $this->_node->setAttribute($name, $value);
     }
 
-    public function removeAttribute(string $key): void
+    /**
+     * @throws Exception
+     */
+    public function removeAttribute(string $name): void
     {
-        if ($this->_closed) {
-            return;
+        if ($this->hasAttribute($name)) {
+            $this->_node->removeAttribute($name);
         }
 
-        $this->_attributes->remove($key);
+        if ($this->hasAttribute("blade-attr-$name")) {
+            $this->_node->removeAttribute("blade-attr-$name");
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function clear(): void
+    {
+        $children = $this->_node->getChildren();
+
+        foreach ($children as $child) {
+            $child->delete();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getInnerSpace(): string
+    {
+        static $found;
+
+        if (!empty($found)) {
+            return $found;
+        }
+
+        $found = "";
+
+        $children = $this->_node->getChildren();
+
+        foreach ($children as $child) {
+            if (empty($found)) {
+                if ($child instanceof TextNode) {
+                    $text = $child->text();
+
+                    if (!str_contains($text, "___SPACE___")) {
+                        continue;
+                    }
+
+                    $found .= $text;
+                }
+            }
+        }
+
+        return $found;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getOuterSpace(): string
+    {
+        static $found;
+
+        if (!empty($found)) {
+            return $found;
+        }
+
+        $found = "";
+
+        $parent = $this->_node->getParent();
+
+        $children = $parent->getChildren();
+
+        foreach ($children as $child) {
+            if ($child->id() === $this->_node->id()) {
+                break;
+            }
+
+            if ($child instanceof TextNode) {
+                $found .= $child->text();
+            }
+        }
+
+        return $found;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function appendText(string $text): void
+    {
+        $indent = $this->getInnerSpace();
+
+        $text = $this->_doc->protectValue("\n$indent$text");
+
+        $txt = new TextNode($text);
+
+        $this->_node->addChild($txt);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function prependText(string $text): void
+    {
+        $indent = $this->getInnerSpace();
+
+        $text = $this->_doc->protectValue("$text\n$indent");
+
+        $txt = new TextNode($text);
+
+        $child = $this->_node->firstChild();
+
+        $this->_node->insertBefore($txt, $child->id());
+    }
+
+    public function __destruct()
+    {
+        foreach (get_object_vars($this) as $property => $value) {
+            unset($this->$property);
+        }
     }
 }
