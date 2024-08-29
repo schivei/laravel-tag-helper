@@ -164,8 +164,6 @@ You can install the package via composer:
 composer require schivei/laravel-tag-helper
 ```
 
-The package will automatically register itself.
-
 ## Usage
 
 You can create your own Tag Helper, by creating a new class and extend from the `Schivei\TagHelper\Helper` class.
@@ -184,10 +182,8 @@ class CustomTagHelper extends Helper
     protected $targetAttribute = 'custom';
 
     protected $targetElements = ['div'];
-    
-    protected $autoRemoveAttribute = true;
 
-    public function process(HtmlElement $element)
+    protected function _process(HtmlElement $element)
     {
         // Manipulate the element
     }
@@ -196,16 +192,17 @@ class CustomTagHelper extends Helper
 ```
 
 To use and apply this tag helper, you need to register it.
-Typically you would do this in the `AppServiceProvider boot()` method or a service provider of your own.
-
-Pay attention, the `$autoRemoveAttribute` property is set to `false` by default.
-If you want to remove the attribute after processing, you need to set it to `true`.
+Typically, you would do this in the `AppServiceProvider boot()` method or a service provider of your own.
 
 ```php
-TagHelper::helper(CustomTagHelper::class);
+$this->app['tag-helper']->helper(CustomTagHelper::class);
 ```
 
-Since you only register the class name of the custom tag helper, you can use dependency injection inside of your custom helper class.
+Pay attention, the `$autoRemoveAttribute` property is set to `true` by default.
+If you do not want to remove the attribute after processing, you can set it to `false`.
+
+Since you only register the class name of the custom tag helper, you can use dependency injection inside your custom
+helper class.
 
 ### Binding your helper to HTML elements and attributes
 
@@ -252,9 +249,7 @@ class CustomLink extends Helper
 {
     protected $targetElement = 'my-custom-link';
 
-    protected $autoRemoveAttribute = true;
-
-    public function process(HtmlElement $element)
+    protected function _process(HtmlElement $element)
     {
         $element->prependOuterHtml('<div class="custom-link">');
         
@@ -279,9 +274,7 @@ class CustomLink extends Helper
 {
     protected $targetElement = 'my-custom-link';
 
-    protected $autoRemoveAttribute = true;
-
-    public function process(HtmlElement $element)
+    protected function _process(HtmlElement $element)
     {
         $element->prependInnerHtml('<span class="custom-link">');
         
@@ -313,9 +306,7 @@ class CustomLink extends Helper
     
     protected $targetElement = 'a';
 
-    protected $autoRemoveAttribute = true;
-
-    public function process(HtmlElement $element)
+    protected function _process(HtmlElement $element)
     {
         $element->setAttribute('href', route($element->getAttribute('route')));
         
@@ -352,7 +343,7 @@ class CustomForm extends Helper
 {
     protected $targetElement = 'form';
 
-    public function process(HtmlElement $element)
+    protected function _process(HtmlElement $element)
     {
         $formMethod = $element->getAttribute('method');
     }
@@ -386,7 +377,7 @@ class CustomForm extends Helper
 
     protected $targetAttribute = 'route';
 
-    public function process(HtmlElement $element)
+    protected function _process(HtmlElement $element)
     {
         $element->setAttribute('href', "{{ route(" . $element->getAttributeForBlade('route') . ") }}");
         
