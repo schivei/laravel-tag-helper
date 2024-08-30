@@ -19,39 +19,25 @@ jobs:
                 with:
                     fetch-depth: 0
 
-            -   name: Get previous tag
-                id: previousTag
-                run: |
-                    name=$(git --no-pager tag --sort=creatordate --merged ${{ github.ref_name }} | tail -2 | head -1)
-                    echo "previousTag: $name"
-                    echo "previousTag=$name" >> $GITHUB_ENV
+            -   name: Executar script de incremento de versão
+                id: incrementar_versao
+                run: ./incrementor.sh ${{ github.sha }}
 
-            -   name: Increment version
-                id: increment
-                run: |
-                    previousTag=$previousTag
-                    IFS='.' read -r -a array <<< "$previousTag"
-                    major=${array[0]}
-                    minor=${array[1]}
-                    patch=${array[2]}
-                    if [ $patch -eq 99 ]; then
-                      patch=0
-                      if [ $minor -eq 99 ]; then
-                        minor=0
-                        major=$((major+1))
-                      else
-                        minor=$((minor+1))
-                      fi
-                    else
-                      patch=$((patch+1))
-                    fi
-                    newTag="v$major.$minor.$patch"
-                    echo "newTag: $newTag"
-                    echo "newTag=$newTag" >> $GITHUB_ENV
+            -   name: Update CHANGELOG
+                id: changelog
+                uses: requarks/changelog-action@v1
+                with:
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    tag: ${{ env.version }}
 
-            -   name: Create Tag
-                run: |
-                    git config --local user.email "costa@elton.schivei.nom.br" \
-                      && git config --local user.name "Elton Schivei Costa" \
-                      && git tag $newTag ${{ github.sha }} -a -m "Tag $newTag" \
-                      && git push origin $newTag
+            -   name: Create Release
+                id: create_release
+                uses: actions/create-release@latest
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    tag_name: ${{ env.version }}
+                    release_name: Release ${{ env.version }}
+                    body: ${{ steps.changelog.outputs.changes }}
+                    draft: false
+                    prerelease: false
